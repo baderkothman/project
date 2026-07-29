@@ -24,11 +24,10 @@ import {
   LibraryBig,
   Upload,
   User,
-  X,
 } from 'lucide-react-native';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
-import { supabase } from '@/lib/supabase';
+import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
 
 const CATEGORIES = [
@@ -217,8 +216,8 @@ export default function AddScreen() {
         blob = await response.blob();
       }
 
-      // Upload to Supabase
-      const { error: uploadError } = await supabase.storage
+      // Upload through the local API.
+      const { error: uploadError } = await dataClient.storage
         .from('books')
         .upload(filePath, blob, {
           contentType: 'image/jpeg',
@@ -228,7 +227,7 @@ export default function AddScreen() {
       if (uploadError) throw uploadError;
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = dataClient.storage
         .from('books')
         .getPublicUrl(filePath);
 
@@ -270,7 +269,7 @@ export default function AddScreen() {
         images.map(uri => handleImageUpload(uri))
       );
 
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await dataClient
         .from('books')
         .insert({
           user_id: session?.user?.id,
@@ -549,7 +548,17 @@ export default function AddScreen() {
                 </TouchableOpacity>
               </View>
             ))}
-            {images.length < 5 }
+            {images.length < 1 && (
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Choose a book photo"
+                style={styles.addImageButton}
+                onPress={pickImage}
+                disabled={loading}>
+                <Camera size={24} color="#1C768F" />
+                <Text style={styles.addImageText}>Choose photo</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 

@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { Stack, Link, useRouter } from 'expo-router';
 import { ArrowLeft, CreditCard as Edit2, Trash2, BookOpen, Plus, Search } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 
 const windowWidth = Dimensions.get('window').width;
@@ -52,7 +52,7 @@ export default function LibraryScreen() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await dataClient
         .from('books')
         .select('*')
         .eq('user_id', session?.user?.id)
@@ -71,7 +71,7 @@ export default function LibraryScreen() {
 
   const handleDelete = async (bookId: string) => {
     try {
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await dataClient
         .from('books')
         .delete()
         .eq('id', bookId);

@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { FileText, ArrowLeft, Camera, User, Save, RefreshCw } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 
@@ -33,7 +33,6 @@ export default function EditProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     loadProfile();
@@ -44,7 +43,7 @@ export default function EditProfileScreen() {
       setLoading(true);
       setError(null);
 
-      const { data, error: profileError } = await supabase
+      const { data, error: profileError } = await dataClient
         .from('profiles')
         .select('username, avatar_url, first_name, last_name, bio')
         .eq('id', session?.user?.id)
@@ -125,7 +124,7 @@ export default function EditProfileScreen() {
         file = await response.blob();
       }
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await dataClient.storage
         .from('avatars')
         .upload(filePath, file, {
           contentType: 'image/jpeg',
@@ -134,7 +133,7 @@ export default function EditProfileScreen() {
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
+      const { data } = dataClient.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
@@ -144,7 +143,7 @@ export default function EditProfileScreen() {
 
       const publicUrl = data.publicUrl;
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await dataClient
         .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', session?.user?.id);
@@ -158,7 +157,6 @@ export default function EditProfileScreen() {
       setError('Failed to upload image. Please try again.');
     } finally {
       setSaving(false);
-      setUploadProgress(0);
     }
   };
 
@@ -169,7 +167,7 @@ export default function EditProfileScreen() {
       setSaving(true);
       setError(null);
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await dataClient
         .from('profiles')
         .update({
           first_name: profile.first_name,

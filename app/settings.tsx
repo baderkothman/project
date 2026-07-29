@@ -5,17 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { 
-  Settings as SettingsIcon, 
-  Bell, 
-  Moon, 
   Lock, 
-  Shield, 
   CircleHelp as HelpCircle, 
   Info, 
   LogOut,
@@ -23,15 +17,13 @@ import {
   ArrowLeft,
   ChevronRight,
 } from 'lucide-react-native';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
+import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { session, isGuest } = useAuth();
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+  const { isGuest } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +31,7 @@ export default function SettingsScreen() {
     try {
       setLoading(true);
       setError(null);
-      await supabase.auth.signOut();
+      await dataClient.auth.signOut();
       router.replace('/(tabs)');
     } catch (err) {
       console.error('Error signing out:', err);
@@ -50,25 +42,6 @@ export default function SettingsScreen() {
   };
 
   const sections = [
-    {
-      title: 'Preferences',
-      items: [
-        {
-          icon: Moon,
-          label: 'Dark Mode',
-          type: 'switch',
-          value: darkMode,
-          onChange: setDarkMode,
-        },
-        {
-          icon: Bell,
-          label: 'Notifications',
-          type: 'switch',
-          value: notifications,
-          onChange: setNotifications,
-        },
-      ],
-    },
     {
       title: 'Account',
       items: [
@@ -119,6 +92,9 @@ export default function SettingsScreen() {
         ]}
         disabled={item.disabled}
         onPress={item.onPress}
+        accessibilityRole="button"
+        accessibilityLabel={item.label}
+        accessibilityState={{ disabled: Boolean(item.disabled) }}
       >
         <View style={styles.itemLeft}>
           <Icon size={24} color={item.disabled ? '#666' : '#FA991C'} />
@@ -131,16 +107,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.itemRight}>
-          {item.type === 'switch' ? (
-            <Switch
-              value={item.value}
-              onValueChange={item.onChange}
-              trackColor={{ false: '#767577', true: '#FA991C' }}
-              thumbColor={item.value ? '#FBF3F2' : '#f4f3f4'}
-            />
-          ) : (
-            <ChevronRight size={20} color="#666" />
-          )}
+          <ChevronRight size={20} color="#666" />
         </View>
       </TouchableOpacity>
     );
@@ -149,7 +116,11 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          style={styles.backButton}
+          onPress={() => router.back()}>
           <ArrowLeft size={24} color="#FBF3F2" />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
@@ -174,6 +145,8 @@ export default function SettingsScreen() {
 
         {!isGuest && (
           <TouchableOpacity 
+            accessibilityRole="button"
+            accessibilityLabel="Sign out"
             style={[styles.logoutButton, loading && styles.logoutButtonDisabled]}
             onPress={handleLogout}
             disabled={loading}

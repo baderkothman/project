@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Share2 } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 import { Modal, TextInput, FlatList } from 'react-native';
 import { Send } from 'lucide-react-native';
@@ -72,7 +72,7 @@ export default function BookDetails() {
 
   const fetchUploader = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await dataClient
         .from('profiles')
         .select('first_name, last_name, username')
         .eq('id', userId)
@@ -90,7 +90,7 @@ export default function BookDetails() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await dataClient
         .from('books')
         .select('*')
         .eq('id', id)
@@ -115,7 +115,7 @@ export default function BookDetails() {
 
     try {
       setLoadingFollowers(true);
-      const { data: followingData, error: followingError } = await supabase
+      const { data: followingData, error: followingError } = await dataClient
         .rpc('get_following_profiles', { uid: session.user.id });
 
       if (followingError) throw followingError;
@@ -134,7 +134,7 @@ export default function BookDetails() {
     try {
       setSharingWith(recipientId);
 
-      const { error: shareError } = await supabase
+      const { error: shareError } = await dataClient
         .from('shared_books')
         .insert({
           book_id: book.id,

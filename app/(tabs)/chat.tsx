@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Search, MessageSquare, UserPlus, UserMinus } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 
 interface ChatPreview {
@@ -74,7 +74,7 @@ export default function ChatScreen() {
     try {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase.rpc('get_recent_chats');
+      const { data, error } = await dataClient.rpc('get_recent_chats');
 
       if (error) {
         console.error('Error loading chats:', error);
@@ -92,7 +92,7 @@ export default function ChatScreen() {
   };
 
   const subscribeToMessages = () => {
-    return supabase
+    return dataClient
       .channel('messages')
       .on(
         'postgres_changes',
@@ -128,7 +128,7 @@ export default function ChatScreen() {
   };
 
   const subscribeToChatUpdates = () => {
-    return supabase
+    return dataClient
       .channel('chat_read_status')
       .on(
         'postgres_changes',
@@ -147,7 +147,7 @@ export default function ChatScreen() {
 
   const markMessagesAsRead = async (senderId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await dataClient
         .from('messages')
         .update({ read: true })
         .eq('recipient_id', session?.user?.id)
@@ -173,8 +173,8 @@ export default function ChatScreen() {
       setSearching(true);
       setError(null);
 
-      const { data: users, error: searchError } = await supabase
-        .from('profiles')
+      const { data: users, error: searchError } = await dataClient
+        .from<SearchResult>('profiles')
         .select('id, username, avatar_url, first_name, last_name')
         .neq('id', session?.user?.id)
         .ilike('username', `%${searchQuery}%`)
@@ -187,16 +187,18 @@ export default function ChatScreen() {
         return;
       }
 
-      const { data: following, error: followError } = await supabase
-        .from('followers')
+      const { data: following, error: followError } = await dataClient
+        .from<{ following_id: string }>('followers')
         .select('following_id')
         .eq('follower_id', session?.user?.id);
 
       if (followError) throw followError;
 
-      const followingIds = new Set((following || []).map(f => f.following_id));
+      const followingRows = (following || []) as { following_id: string }[];
+      const userRows = users as SearchResult[];
+      const followingIds = new Set(followingRows.map((f) => f.following_id));
 
-      const resultsWithFollowing = users.map(user => ({
+      const resultsWithFollowing = userRows.map((user) => ({
         ...user,
         is_following: followingIds.has(user.id)
       }));
@@ -217,7 +219,7 @@ export default function ChatScreen() {
       const isFollowing = searchResults.find(r => r.id === userId)?.is_following;
 
       if (isFollowing) {
-        const { error } = await supabase
+        const { error } = await dataClient
           .from('followers')
           .delete()
           .eq('follower_id', session?.user?.id)
@@ -225,7 +227,7 @@ export default function ChatScreen() {
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { error } = await dataClient
           .from('followers')
           .insert({
             follower_id: session?.user?.id,

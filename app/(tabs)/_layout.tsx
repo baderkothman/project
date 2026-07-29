@@ -1,52 +1,66 @@
 import { Tabs } from 'expo-router';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Home, Book, MessageSquare, User, Plus, Heart, Settings } from 'lucide-react-native';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { Link } from 'expo-router';
+import { colors, touchTarget, type } from '@/src/presentation/theme/tokens';
 import React from 'react';
 
 export default function TabLayout() {
-  const { session, isGuest } = useAuth();
+  const { isGuest } = useAuth();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#FA991C',
-        tabBarInactiveTintColor: '#FBF3F2',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
-          backgroundColor: '#032539',
+          backgroundColor: colors.background,
           borderTopWidth: 1,
-          borderTopColor: '#1C768F',
+          borderTopColor: colors.border,
+          minHeight: 64,
         },
+        tabBarLabelStyle: type.caption,
         headerStyle: {
-          backgroundColor: '#032539',
+          backgroundColor: colors.background,
         },
         headerTitleStyle: {
-          color: '#FBF3F2',
-          fontSize: 20,
-          fontWeight: 'bold',
+          color: colors.text,
+          ...type.heading,
         },
-        headerTintColor: '#FBF3F2',
+        headerTintColor: colors.text,
         headerRight: () => (
           <View style={styles.headerRight}>
             {!isGuest ? (
               <View style={styles.headerButtons}>
                 <Link href="/wishlist" asChild>
-                  <TouchableOpacity style={styles.iconButton}>
-                    <Heart size={20} color="#FA991C" />
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    accessibilityRole="button"
+                    accessibilityLabel="Open wishlist"
+                  >
+                    <Heart size={21} color={colors.primary} />
                   </TouchableOpacity>
                 </Link>
                 <Link href="/settings" asChild>
-                  <TouchableOpacity style={styles.iconButton}>
-                    <Settings size={20} color="#FA991C" />
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    accessibilityRole="button"
+                    accessibilityLabel="Open settings"
+                  >
+                    <Settings size={21} color={colors.primary} />
                   </TouchableOpacity>
                 </Link>
               </View>
             ) : (
               <View style={styles.authButtons}>
                 <Link href="/(auth)/login" asChild>
-                  <TouchableOpacity style={[styles.iconButton, styles.emptyProfileButton]}>
-                    <User size={25} color="#FA991C" />
+                  <TouchableOpacity
+                    style={[styles.iconButton, styles.emptyProfileButton]}
+                    accessibilityRole="button"
+                    accessibilityLabel="Sign in"
+                  >
+                    <User size={24} color={colors.primary} />
                   </TouchableOpacity>
                 </Link>
               </View>
@@ -102,17 +116,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FBF3F2',
+    ...touchTarget,
+    borderRadius: 24,
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FA991C',
   },
   emptyProfileButton: {
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },

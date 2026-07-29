@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { LogIn, UserPlus, WifiOff, Settings, Share2, RefreshCw } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
-import { useRetry } from '@/hooks/useRetry';
-import ShareModal from '@/components/ShareModal';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
+import { useRetry } from '@/src/presentation/hooks/useRetry';
+import ShareModal from '@/src/presentation/components/ShareModal';
 import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
 
@@ -113,8 +113,8 @@ export default function ProfileScreen() {
       if (!userId) return;
 
       const [followerResult, followingResult] = await Promise.all([
-        supabase.rpc('get_follower_count', { uid: userId }),
-        supabase.rpc('get_following_count', { uid: userId })
+        dataClient.rpc('get_follower_count', { uid: userId }),
+        dataClient.rpc('get_following_count', { uid: userId })
       ]);
 
       if (followerResult.error) throw followerResult.error;
@@ -144,7 +144,7 @@ export default function ProfileScreen() {
 
   const fetchUserProfile = useCallback(async () => {
     try {
-      const { data, error: profileError } = await supabase
+      const { data, error: profileError } = await dataClient
   .from('profiles')
   .select('first_name, last_name, bio, avatar_url, books_read, books_exchanged, library_count, wishlist_count, history_count')
   .eq('id', session?.user?.id)
@@ -175,7 +175,7 @@ export default function ProfileScreen() {
 
   const fetchUserBooks = useCallback(async () => {
     try {
-      const { data, error: booksError } = await supabase
+      const { data, error: booksError } = await dataClient
         .from('books')
         .select('id, title, author, price, condition, images, created_at')
         .eq('user_id', session?.user?.id)

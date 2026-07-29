@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { Stack, useLocalSearchParams, Link, useRouter } from 'expo-router';
 import { ArrowLeft, UserPlus, UserMinus } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 
 interface Profile {
@@ -44,7 +44,7 @@ export default function FollowersScreen() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await dataClient
         .rpc('get_follower_profiles', { uid: id });
 
       if (fetchError) throw fetchError;
@@ -55,7 +55,7 @@ export default function FollowersScreen() {
       if (session?.user?.id) {
         const followingStatus: Record<string, boolean> = {};
         for (const follower of data || []) {
-          const { data: isFollowing } = await supabase
+          const { data: isFollowing } = await dataClient
             .from('followers')
             .select('id')
             .eq('follower_id', session.user.id)
@@ -84,7 +84,7 @@ export default function FollowersScreen() {
       const isFollowing = followingMap[profileId];
 
       if (isFollowing) {
-        const { error } = await supabase
+        const { error } = await dataClient
           .from('followers')
           .delete()
           .eq('follower_id', session.user.id)
@@ -92,7 +92,7 @@ export default function FollowersScreen() {
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { error } = await dataClient
           .from('followers')
           .insert({
             follower_id: session.user.id,

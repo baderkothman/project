@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, UserPlus, User, Calendar } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { dataClient } from '@/src/infrastructure/local-api/client';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import 'react-native-url-polyfill/auto';
 import React from 'react';
@@ -98,7 +98,7 @@ export default function SignUpScreen() {
       setLoading(true);
       setErrors({});
 
-      const { error } = await supabase.auth.signUp({
+      const { error } = await dataClient.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -142,15 +142,17 @@ export default function SignUpScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.confirmationContainer}>
-          <Text style={styles.confirmationTitle}>Check your email</Text>
+          <Text style={styles.confirmationTitle}>Account created</Text>
           <Text style={styles.confirmationText}>
-            We've sent you an email with a confirmation link. Please check your inbox and click the link to verify your account.
+            Your local account is ready. You can start discovering and exchanging books now.
           </Text>
-          <Link href="/login" asChild>
-            <TouchableOpacity style={styles.loginButton}>
-              <Text style={styles.loginButtonText}>Return to Login</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Start exploring books"
+            style={styles.loginButton}
+            onPress={() => router.replace('/(tabs)')}>
+            <Text style={styles.loginButtonText}>Start Exploring</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -177,6 +179,7 @@ export default function SignUpScreen() {
           <View style={styles.inputContainer}>
             <User size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="First name"
               style={styles.input}
               placeholder="First Name"
               placeholderTextColor="#1C768F"
@@ -193,6 +196,7 @@ export default function SignUpScreen() {
           <View style={styles.inputContainer}>
             <User size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="Last name"
               style={styles.input}
               placeholder="Last Name"
               placeholderTextColor="#1C768F"
@@ -209,12 +213,14 @@ export default function SignUpScreen() {
           <View style={styles.inputContainer}>
             <Mail size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="Email address"
               style={styles.input}
               placeholder="Email Address"
               placeholderTextColor="#1C768F"
               value={formData.email}
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               autoCapitalize="none"
+              autoComplete="email"
               keyboardType="email-address"
             />
           </View>
@@ -225,6 +231,7 @@ export default function SignUpScreen() {
           <View style={styles.inputContainer}>
             <Lock size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="Password"
               style={styles.input}
               placeholder="Password"
               placeholderTextColor="#1C768F"
@@ -233,6 +240,7 @@ export default function SignUpScreen() {
                 setFormData({ ...formData, password: text })
               }
               secureTextEntry
+              autoComplete="new-password"
             />
           </View>
           {errors.password && (
@@ -242,6 +250,7 @@ export default function SignUpScreen() {
           <View style={styles.inputContainer}>
             <Lock size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="Confirm password"
               style={styles.input}
               placeholder="Confirm Password"
               placeholderTextColor="#1C768F"
@@ -270,6 +279,8 @@ export default function SignUpScreen() {
           ) : (
             <>
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`Birthdate, ${formData.birthdate.toLocaleDateString()}`}
                 style={styles.inputContainer}
                 onPress={() => setShowDatePicker(true)}>
                 <Calendar size={20} color="#1C768F" style={styles.inputIcon} />
@@ -293,6 +304,8 @@ export default function SignUpScreen() {
           )}
 
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Create account"
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleSignUp}
             disabled={loading}>

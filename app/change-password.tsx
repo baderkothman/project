@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
 
 export default function ChangePasswordScreen() {
@@ -45,8 +45,8 @@ export default function ChangePasswordScreen() {
       }
 
       // First verify the old password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: (await supabase.auth.getUser()).data.user?.email || '',
+      const { error: signInError } = await dataClient.auth.signInWithPassword({
+        email: (await dataClient.auth.getUser()).data.user?.email || '',
         password: oldPassword,
       });
 
@@ -55,7 +55,7 @@ export default function ChangePasswordScreen() {
       }
 
       // Update the password
-      const { error: updateError } = await supabase.auth.updateUser({
+      const { error: updateError } = await dataClient.auth.updateUser({
         password: newPassword,
       });
 

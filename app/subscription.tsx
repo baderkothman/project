@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CreditCard, Check, ArrowLeft } from 'lucide-react-native';
-import { useStripe } from '@/hooks/useStripe';
+import { useStripe } from '@/src/presentation/hooks/useStripe';
 import React from 'react';
 
 export const STRIPE_PRODUCTS = {

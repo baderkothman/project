@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { UserPlus, UserMinus, BookOpen } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 
 const windowWidth = Dimensions.get('window').width;
@@ -69,7 +69,7 @@ export default function UserProfileScreen() {
 
   const loadProfile = async () => {
     try {
-      const { data, error: profileError } = await supabase
+      const { data, error: profileError } = await dataClient
         .from('profiles')
         .select('*')
         .eq('id', id)
@@ -85,7 +85,7 @@ export default function UserProfileScreen() {
 
   const loadBooks = async () => {
     try {
-      const { data, error: booksError } = await supabase
+      const { data, error: booksError } = await dataClient
         .from('books')
         .select('*')
         .eq('user_id', id)
@@ -103,7 +103,7 @@ export default function UserProfileScreen() {
 
   const checkFollowStatus = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await dataClient
         .from('followers')
         .select('id')
         .eq('follower_id', session?.user?.id)
@@ -122,7 +122,7 @@ export default function UserProfileScreen() {
       setFollowLoading(true);
 
       if (isFollowing) {
-        const { error } = await supabase
+        const { error } = await dataClient
           .from('followers')
           .delete()
           .eq('follower_id', session?.user?.id)
@@ -130,7 +130,7 @@ export default function UserProfileScreen() {
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { error } = await dataClient
           .from('followers')
           .insert({
             follower_id: session?.user?.id,

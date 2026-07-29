@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, BookOpen } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
 
 interface Book {
@@ -39,7 +39,7 @@ export default function AllBooksScreen() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await dataClient
         .from('books')
         .select('*')
         .order('created_at', { ascending: false });

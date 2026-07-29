@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import { Stack, Link, useRouter } from 'expo-router';
 import { ArrowLeft, Heart, Trash2, WifiOff } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { getGoogleBook } from '@/src/application/services/google-books';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import React from 'react';
@@ -32,7 +33,7 @@ interface GoogleBook {
     title: string;
     authors?: string[];
     imageLinks?: {
-      thumbnail: string;
+      thumbnail?: string;
     };
     averageRating?: number;
   };
@@ -57,33 +58,34 @@ export default function WishlistScreen() {
       setLoading(true);
       setError(null);
 
-      const { data: wishlistData, error: wishlistError } = await supabase
-        .from('wishlist')
+      const { data: wishlistData, error: wishlistError } = await dataClient
+        .from<WishlistItem>('wishlist')
         .select('id, book_id, google_books_id, created_at')
         .eq('user_id', session?.user?.id)
         .order('created_at', { ascending: false });
 
       if (wishlistError) throw wishlistError;
+      const wishlistItems = (wishlistData || []) as WishlistItem[];
 
-      if (!wishlistData || wishlistData.length === 0) {
+      if (wishlistItems.length === 0) {
         setBooks([]);
         return;
       }
 
       // Separate local books and Google Books IDs
-      const localBookIds = wishlistData
-        .filter((item): item is WishlistItem => item.book_id !== null)
-        .map(item => item.book_id);
+      const localBookIds = wishlistItems
+        .filter((item) => item.book_id !== null)
+        .map((item) => item.book_id as string);
 
-      const googleBookIds = wishlistData
-        .filter((item): item is WishlistItem => item.google_books_id !== null)
-        .map(item => item.google_books_id);
+      const googleBookIds = wishlistItems
+        .filter((item) => item.google_books_id !== null)
+        .map((item) => item.google_books_id as string);
 
       // Fetch local books
       let localBooks: Book[] = [];
       if (localBookIds.length > 0) {
-        const { data: booksData, error: booksError } = await supabase
-          .from('books')
+        const { data: booksData, error: booksError } = await dataClient
+          .from<Book>('books')
           .select('*')
           .in('id', localBookIds);
 
@@ -94,27 +96,16 @@ export default function WishlistScreen() {
       // Fetch Google Books
       let googleBooks: GoogleBook[] = [];
       if (googleBookIds.length > 0) {
-        const API_URL = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_URL;
-        const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
-
-        const googleBooksPromises = googleBookIds.map(async (id) => {
-          const response = await fetch(
-            `${API_URL}/${id}?key=${API_KEY}&fields=id,volumeInfo(title,authors,imageLinks,averageRating)`
-          );
-          if (!response.ok) throw new Error('Failed to fetch Google Book');
-          return response.json();
-        });
-
-        googleBooks = await Promise.all(googleBooksPromises);
+        googleBooks = await Promise.all(googleBookIds.map(getGoogleBook));
       }
 
       // Combine and sort by created_at
       const allBooks = [...localBooks, ...googleBooks].sort((a, b) => {
-        const aDate = wishlistData.find(item => 
+        const aDate = wishlistItems.find((item) =>
           item.book_id === (a as Book).id || 
           item.google_books_id === (a as GoogleBook).id
         )?.created_at || '';
-        const bDate = wishlistData.find(item => 
+        const bDate = wishlistItems.find((item) =>
           item.book_id === (b as Book).id || 
           item.google_books_id === (b as GoogleBook).id
         )?.created_at || '';
@@ -150,7 +141,7 @@ export default function WishlistScreen() {
 
   const removeFromWishlist = async (bookId: string, isGoogleBook: boolean) => {
     try {
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await dataClient
         .from('wishlist')
         .delete()
         .eq('user_id', session?.user?.id)

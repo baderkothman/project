@@ -15,12 +15,10 @@ import {
 } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Send, ArrowLeft, Info, BookOpen, Share2, Heart, Download } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { getGoogleBook } from '@/src/application/services/google-books';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-
-const API_URL = 'https://www.googleapis.com/books/v1/volumes';
-const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
 
 interface GoogleBook {
   id: string;
@@ -29,7 +27,7 @@ interface GoogleBook {
     authors?: string[];
     description?: string;
     imageLinks?: {
-      thumbnail: string;
+      thumbnail?: string;
     };
     previewLink?: string;
     publishedDate?: string;
@@ -91,15 +89,7 @@ export default function GoogleBookDetails() {
         throw new Error('Book ID is required');
       }
 
-      const response = await fetch(
-        `${API_URL}/${id}?key=${API_KEY}&fields=id,volumeInfo(title,authors,description,imageLinks,previewLink,publishedDate,language,categories,pageCount,averageRating,ratingsCount),saleInfo`
-      );
-
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await getGoogleBook(String(id));
       
       if (!data || !data.volumeInfo) {
         throw new Error('Invalid book data received');
@@ -113,7 +103,7 @@ export default function GoogleBookDetails() {
           .replace(/&amp;/g, '&');
       }
       
-      setBook(data);
+      setBook(data as GoogleBook);
     } catch (err) {
       console.error('Error fetching book:', err);
       setError(err instanceof Error ? err.message : 'Failed to load book details. Please try again.');
@@ -124,7 +114,7 @@ export default function GoogleBookDetails() {
 
   const checkWishlistStatus = async () => {
     try {
-      const { data, error: wishlistError } = await supabase
+      const { data, error: wishlistError } = await dataClient
         .from('wishlist')
         .select('id')
         .eq('user_id', session?.user?.id)
@@ -148,7 +138,7 @@ export default function GoogleBookDetails() {
       setWishlistLoading(true);
 
       if (isInWishlist) {
-        const { error: removeError } = await supabase
+        const { error: removeError } = await dataClient
           .from('wishlist')
           .delete()
           .eq('user_id', session?.user?.id)
@@ -156,7 +146,7 @@ export default function GoogleBookDetails() {
 
         if (removeError) throw removeError;
       } else {
-        const { error: addError } = await supabase
+        const { error: addError } = await dataClient
           .from('wishlist')
           .insert({
             user_id: session?.user?.id,
@@ -181,7 +171,7 @@ export default function GoogleBookDetails() {
     
     try {
       setLoadingFollowers(true);
-      const { data: followingData, error: followingError } = await supabase
+      const { data: followingData, error: followingError } = await dataClient
         .rpc('get_following_profiles', { uid: session.user.id });
 
       if (followingError) throw followingError;
@@ -200,7 +190,7 @@ export default function GoogleBookDetails() {
     try {
       setSharingWith(recipientId);
       
-      const { error: shareError } = await supabase
+      const { error: shareError } = await dataClient
         .from('shared_books')
         .insert({
           book_id: book.id,

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, LogIn } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
 
 export default function LoginScreen() {
@@ -27,7 +27,7 @@ export default function LoginScreen() {
       setLoading(true);
       setError(null);
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await dataClient.auth.signInWithPassword({
         email,
         password,
       });
@@ -74,12 +74,14 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <Mail size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="Email address"
               style={styles.input}
               placeholder="Email"
               placeholderTextColor="#1C768F"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
+              autoComplete="email"
               keyboardType="email-address"
             />
           </View>
@@ -87,16 +89,20 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <Lock size={20} color="#1C768F" style={styles.inputIcon} />
             <TextInput
+              accessibilityLabel="Password"
               style={styles.input}
               placeholder="Password"
               placeholderTextColor="#1C768F"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              autoComplete="current-password"
             />
           </View>
 
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Sign in"
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}>

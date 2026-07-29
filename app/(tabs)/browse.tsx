@@ -30,13 +30,11 @@ import {
   ChevronRight,
   Heart,
 } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { searchGoogleBooks } from '@/src/application/services/google-books';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
-
-const API_URL = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_URL;
-const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
 
 interface Book {
   id: string;
@@ -45,7 +43,7 @@ interface Book {
     authors?: string[];
     description?: string;
     imageLinks?: {
-      thumbnail: string;
+      thumbnail?: string;
     };
     previewLink?: string;
     publishedDate?: string;
@@ -111,35 +109,6 @@ const PREVIEW_OPTIONS = [
   { id: 'external', name: 'External Browser' },
 ];
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
-
-async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<any> {
-  try {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const text = await response.text();
-
-    try {
-      return JSON.parse(text);
-    } catch (parseError) {
-      console.error('JSON Parse Error. Raw response:', text);
-      throw new Error(`Failed to parse JSON response: ${(parseError as Error).message}`);
-    }
-  } catch (error) {
-    if (retries > 0) {
-      console.log(`Retrying fetch... ${retries} attempts remaining`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-      return fetchWithRetry(url, retries - 1);
-    }
-    throw error;
-  }
-}
-
 export default function BrowseScreen() {
   const router = useRouter();
   const { session, isGuest } = useAuth();
@@ -178,7 +147,7 @@ export default function BrowseScreen() {
       setLoadingHistory(true);
       setError(null);
 
-      const { data: profile, error: fetchError } = await supabase
+      const { data: profile, error: fetchError } = await dataClient
         .from('profiles')
         .select('search_history')
         .eq('id', session?.user?.id)
@@ -201,7 +170,7 @@ export default function BrowseScreen() {
     try {
       const newTerm = term.trim();
 
-      const { data: currentProfile, error: fetchError } = await supabase
+      const { data: currentProfile, error: fetchError } = await dataClient
         .from('profiles')
         .select('search_history')
         .eq('id', session.user.id)
@@ -214,7 +183,7 @@ export default function BrowseScreen() {
 
       const newHistory = [newTerm, ...filteredHistory].slice(0, 10);
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await dataClient
         .from('profiles')
         .update({ search_history: newHistory })
         .eq('id', session.user.id);
@@ -253,10 +222,6 @@ export default function BrowseScreen() {
         await saveSearchTerm(termToSearch.trim());
       }
 
-      if (!API_URL || !API_KEY) {
-        throw new Error('API configuration is missing');
-      }
-
       let searchQuery = termToSearch;
 
       if (selectedGenres.length > 0) {
@@ -267,20 +232,10 @@ export default function BrowseScreen() {
         searchQuery += ' ' + selectedLanguages.map(lang => `language:${lang}`).join(' OR ');
       }
 
-      let url = `${API_URL}?q=${encodeURIComponent(searchQuery)}&key=${API_KEY}&maxResults=40`;
-
-      switch (sortBy) {
-        case 'newest':
-          url += '&orderBy=newest';
-          break;
-        case 'oldest':
-          url += '&orderBy=published-date';
-          break;
-        default:
-          url += '&orderBy=relevance';
-      }
-
-      const data = await fetchWithRetry(url);
+      const data = await searchGoogleBooks(searchQuery, {
+        maxResults: 40,
+        orderBy: sortBy === 'newest' ? 'newest' : 'relevance',
+      });
 
       if (!data.items || !Array.isArray(data.items)) {
         setBooks([]);
@@ -288,7 +243,7 @@ export default function BrowseScreen() {
         return;
       }
 
-      let filteredBooks = data.items;
+      let filteredBooks = data.items as Book[];
 
 
       if (selectedPreviewType.length > 0) {
@@ -351,7 +306,7 @@ export default function BrowseScreen() {
     }
 
     try {
-      const { data: existingEntry } = await supabase
+      const { data: existingEntry } = await dataClient
         .from('wishlist')
         .select('id')
         .eq('user_id', session?.user?.id)
@@ -363,7 +318,7 @@ export default function BrowseScreen() {
         return;
       }
 
-      const { error } = await supabase
+      const { error } = await dataClient
         .from('wishlist')
         .insert({
           user_id: session?.user?.id,
@@ -383,7 +338,7 @@ export default function BrowseScreen() {
   const clearSearchHistory = async () => {
     if (!session?.user?.id) return;
     try {
-      const { error } = await supabase
+      const { error } = await dataClient
         .from('profiles')
         .update({ search_history: [] })
         .eq('id', session.user.id);

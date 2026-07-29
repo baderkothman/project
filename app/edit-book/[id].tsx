@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Camera, Save, Trash2, BookOpen, User, Globe as Globe2, DollarSign, Info, Languages, LayoutGrid } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 
@@ -89,7 +89,7 @@ export default function EditBookScreen() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await dataClient
         .from('books')
         .select('*')
         .eq('id', id)
@@ -175,7 +175,7 @@ export default function EditBookScreen() {
         file = await response.blob();
       }
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await dataClient.storage
         .from('books')
         .upload(filePath, file, {
           contentType: 'image/jpeg',
@@ -184,7 +184,7 @@ export default function EditBookScreen() {
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
+      const { data } = dataClient.storage
         .from('books')
         .getPublicUrl(filePath);
 
@@ -222,7 +222,7 @@ export default function EditBookScreen() {
         return;
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await dataClient
         .from('books')
         .update({
           ...book,

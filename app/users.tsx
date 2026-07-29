@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { ArrowLeft, UserPlus, UserMinus } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 
 interface User {
@@ -42,8 +42,8 @@ export default function UsersScreen() {
       setLoading(true);
       setError(null);
 
-      let query = supabase
-        .from('profiles')
+      let query = dataClient
+        .from<User>('profiles')
         .select('id, username, avatar_url, first_name, last_name')
         .ilike('username', `%${searchQuery}%`)
         .order('username');
@@ -56,23 +56,25 @@ export default function UsersScreen() {
       const { data: users, error: searchError } = await query;
 
       if (searchError) throw searchError;
+      const userRows = (users || []) as User[];
 
       if (session?.user?.id) {
-        const { data: following } = await supabase
-          .from('followers')
+        const { data: following } = await dataClient
+          .from<{ following_id: string }>('followers')
           .select('following_id')
           .eq('follower_id', session.user.id);
 
-        const followingIds = new Set((following || []).map(f => f.following_id));
+        const followingRows = (following || []) as { following_id: string }[];
+        const followingIds = new Set(followingRows.map((f) => f.following_id));
         setFollowingMap(
-          users?.reduce((acc, user) => ({
+          userRows.reduce((acc: Record<string, boolean>, user: User) => ({
             ...acc,
             [user.id]: followingIds.has(user.id)
-          }), {}) || {}
+          }), {})
         );
       }
 
-      setUsers(users || []);
+      setUsers(userRows);
     } catch (err) {
       console.error('Error searching users:', err);
       setError('Failed to search users');
@@ -86,13 +88,13 @@ export default function UsersScreen() {
       const isFollowing = followingMap[userId];
 
       if (isFollowing) {
-        await supabase
+        await dataClient
           .from('followers')
           .delete()
           .eq('follower_id', session?.user?.id)
           .eq('following_id', userId);
       } else {
-        await supabase
+        await dataClient
           .from('followers')
           .insert({
             follower_id: session?.user?.id,

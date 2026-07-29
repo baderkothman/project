@@ -10,7 +10,6 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import {
   Search,
@@ -22,8 +21,16 @@ import {
 } from 'lucide-react-native';
 import { Link, useRouter } from 'expo-router';
 
-import { useWishlist } from '@/hooks/useWishlist';
-import { supabase } from '@/lib/supabase';
+import { useWishlist } from '@/src/presentation/hooks/useWishlist';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { searchGoogleBooks } from '@/src/application/services/google-books';
+import {
+  colors,
+  radius,
+  spacing,
+  touchTarget,
+  type,
+} from '@/src/presentation/theme/tokens';
 
 // ==========================
 // ✅ Type Declarations
@@ -51,23 +58,6 @@ type UserBook = {
 };
 
 // ==========================
-// ✅ Helper: Retry Fetch
-// ==========================
-const fetchWithRetry = async (url: string, retries = 3): Promise<any> => {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    if (retries > 0) {
-      await new Promise(res => setTimeout(res, 1000));
-      return fetchWithRetry(url, retries - 1);
-    }
-    throw err;
-  }
-};
-
-// ==========================
 // ✅ HomeScreen Component
 // ==========================
 export default function HomeScreen() {
@@ -80,10 +70,8 @@ export default function HomeScreen() {
   const [userBooks, setUserBooks] = useState<UserBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const API_URL = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_URL;
-  const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
+  const [catalogUnavailable, setCatalogUnavailable] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -92,25 +80,26 @@ export default function HomeScreen() {
   };
 
   const fetchBooks = async () => {
-    if (!API_URL || !API_KEY) {
-      setError('Missing API configuration');
-      return;
-    }
-
     try {
-      const dailyRes = await fetchWithRetry(`${API_URL}?q=The+Alchemist+Paulo+Coelho&key=${API_KEY}`);
+      setCatalogUnavailable(false);
+      const dailyRes = await searchGoogleBooks('The Alchemist Paulo Coelho', {
+        maxResults: 1,
+      });
       setDailyBook(dailyRes.items?.[0] || null);
 
-      const pdfRes = await fetchWithRetry(`${API_URL}?q=pdf&filter=free-ebooks&key=${API_KEY}&maxResults=10`);
+      const pdfRes = await searchGoogleBooks('classic literature', {
+        filter: 'free-ebooks',
+        maxResults: 10,
+      });
       setPdfBooks(pdfRes.items || []);
-    } catch (err: any) {
-      setError(`Failed to fetch books: ${err.message}`);
+    } catch {
+      setCatalogUnavailable(true);
     }
   };
 
   const fetchUserBooks = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await dataClient
         .from('books')
         .select('*')
         .order('created_at', { ascending: false })
@@ -119,6 +108,7 @@ export default function HomeScreen() {
       setUserBooks(data || []);
     } catch (err) {
       console.error('Error fetching user books:', err);
+      setLocalError('The local book collection could not be loaded.');
     }
   };
 
@@ -126,7 +116,7 @@ export default function HomeScreen() {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
-    setError(null);
+    setLocalError(null);
     await Promise.all([fetchBooks(), fetchUserBooks()]);
 
     setRefreshing(false);
@@ -141,8 +131,17 @@ export default function HomeScreen() {
     <TouchableOpacity
       style={styles.userBookCard}
       onPress={() => router.push(`/book/${item.id}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`${item.title} by ${item.author}, ${item.price.toFixed(2)} dollars`}
     >
-      <Image source={{ uri: item.images[0] }} style={styles.userBookImage} />
+      <Image
+        source={{
+          uri:
+            item.images[0] ||
+            'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&q=80',
+        }}
+        style={styles.userBookImage}
+      />
       <View style={styles.userBookInfo}>
         <Text style={styles.userBookTitle} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.userBookAuthor}>by {item.author}</Text>
@@ -157,7 +156,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading books...</Text>
       </View>
     );
@@ -171,32 +170,38 @@ export default function HomeScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={() => loadData(true)}
-          tintColor="#FA991C"
-          colors={['#FA991C']}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
         />
       }
     >
       {/* Search */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color="#1C768F" style={styles.searchIcon} />
+          <Search size={21} color={colors.info} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search users..."
-            placeholderTextColor="#1C768F"
+            placeholder="Find readers by username"
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
             onSubmitEditing={handleSearch}
             returnKeyType="search"
+            accessibilityLabel="Find readers by username"
           />
         </View>
       </View>
 
-      {/* Error */}
-      {error && (
+      {/* Local data error */}
+      {localError && (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => loadData()}>
+          <Text style={styles.errorText}>{localError}</Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => loadData()}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading books"
+          >
             <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
@@ -206,10 +211,14 @@ export default function HomeScreen() {
       {userBooks.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Library size={24} color="#FA991C" />
+            <Library size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Discover Books</Text>
             <Link href="/all-books" asChild>
-              <TouchableOpacity>
+              <TouchableOpacity
+                style={styles.viewAllButton}
+                accessibilityRole="button"
+                accessibilityLabel="View all community books"
+              >
                 <Text style={styles.viewAllText}>View All</Text>
               </TouchableOpacity>
             </Link>
@@ -225,16 +234,27 @@ export default function HomeScreen() {
         </View>
       )}
 
+      {catalogUnavailable && (
+        <View style={styles.catalogNotice}>
+          <Text style={styles.catalogNoticeText}>
+            The online catalog is temporarily unavailable. Your local collection
+            is still ready to browse.
+          </Text>
+        </View>
+      )}
+
       {/* Daily Book */}
       {dailyBook && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <TrendingUp size={24} color="#FA991C" />
+            <TrendingUp size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Daily Book</Text>
           </View>
           <TouchableOpacity
             style={styles.dailyBookCard}
             onPress={() => router.push(`/google-book/${dailyBook.id}`)}
+            accessibilityRole="button"
+            accessibilityLabel={`${dailyBook.volumeInfo.title} book details`}
           >
             <Image
               source={{
@@ -253,7 +273,7 @@ export default function HomeScreen() {
               </Text>
               <View style={styles.dailyBookMeta}>
                 <View style={styles.ratingContainer}>
-                  <Star size={16} color="#FA991C" fill="#FA991C" />
+                  <Star size={16} color={colors.primary} fill={colors.primary} />
                   <Text style={styles.ratingText}>
                     {dailyBook.volumeInfo.averageRating?.toFixed(1) || '4.8'}
                   </Text>
@@ -261,8 +281,10 @@ export default function HomeScreen() {
                 <TouchableOpacity
                   style={styles.wishlistButton}
                   onPress={() => addToWishlist(dailyBook.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Add ${dailyBook.volumeInfo.title} to wishlist`}
                 >
-                  <Heart size={16} color="#FA991C" />
+                  <Heart size={18} color={colors.primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -274,7 +296,7 @@ export default function HomeScreen() {
       {pdfBooks.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Download size={24} color="#FA991C" />
+            <Download size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>PDF Books</Text>
           </View>
           <FlatList
@@ -283,6 +305,8 @@ export default function HomeScreen() {
               <TouchableOpacity
                 style={styles.userBookCard}
                 onPress={() => router.push(`/google-book/${item.id}`)}
+                accessibilityRole="button"
+                accessibilityLabel={`${item.volumeInfo.title} book details`}
               >
                 <Image
                   source={{
@@ -302,7 +326,7 @@ export default function HomeScreen() {
                   )}
                   <View style={styles.dailyBookMeta}>
                     <View style={styles.ratingContainer}>
-                      <Star size={16} color="#FA991C" fill="#FA991C" />
+                      <Star size={16} color={colors.primary} fill={colors.primary} />
                       <Text style={styles.ratingText}>
                         {item.volumeInfo.averageRating?.toFixed(1) || '4.5'}
                       </Text>
@@ -310,8 +334,10 @@ export default function HomeScreen() {
                     <TouchableOpacity
                       style={styles.wishlistButton}
                       onPress={() => addToWishlist(item.id)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Add ${item.volumeInfo.title} to wishlist`}
                     >
-                      <Heart size={16} color="#FA991C" />
+                      <Heart size={18} color={colors.primary} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -332,81 +358,95 @@ export default function HomeScreen() {
 // ✅ Styles
 // ==========================
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#032539' },
+  container: { flex: 1, backgroundColor: colors.background },
   searchContainer: {
-    padding: 20,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    backgroundColor: '#032539',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.border,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    height: 50,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    minHeight: touchTarget.minHeight,
   },
   searchIcon: { marginRight: 12 },
-  searchInput: { flex: 1, fontSize: 16, color: '#032539' },
-  section: { padding: 20 },
+  searchInput: { flex: 1, ...type.body, color: colors.text },
+  section: { paddingHorizontal: spacing.md, paddingVertical: spacing.lg },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  sectionTitle: { fontSize: 20, fontWeight: '600', color: '#FBF3F2', marginLeft: 8, flex: 1 },
-  viewAllText: { color: '#FA991C', fontSize: 14, fontWeight: '600' },
-  userBooksList: { paddingRight: 20 },
+  sectionTitle: { ...type.heading, color: colors.text, marginLeft: spacing.xs, flex: 1 },
+  viewAllButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.xs },
+  viewAllText: { color: colors.primary, ...type.label },
+  userBooksList: { paddingRight: spacing.md },
   userBookCard: {
-    width: 180,
-    backgroundColor: '#1C768F',
-    borderRadius: 12,
-    marginRight: 12,
+    width: 164,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    marginRight: spacing.sm,
     overflow: 'hidden',
   },
-  userBookImage: { width: '100%', height: 240, backgroundColor: '#032539' },
+  userBookImage: { width: '100%', height: 218, backgroundColor: colors.surface },
   userBookInfo: { padding: 12 },
-  userBookTitle: { fontSize: 16, fontWeight: '600', color: '#FBF3F2', marginBottom: 4 },
-  userBookAuthor: { fontSize: 14, color: '#FBF3F2', opacity: 0.8, marginBottom: 8 },
-  userBookPrice: { fontSize: 18, fontWeight: 'bold', color: '#FA991C', marginBottom: 8 },
+  userBookTitle: { ...type.label, color: colors.text, marginBottom: 4 },
+  userBookAuthor: { ...type.caption, color: colors.textMuted, marginBottom: 8 },
+  userBookPrice: { fontSize: 18, lineHeight: 24, fontWeight: '700', color: colors.primary, marginBottom: 8 },
   userBookCondition: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
     alignSelf: 'flex-start',
   },
-  conditionText: { fontSize: 12, color: '#FBF3F2', fontWeight: '500' },
-  dailyBookCard: { flexDirection: 'row', backgroundColor: '#1C768F', borderRadius: 12, overflow: 'hidden' },
+  conditionText: { ...type.caption, color: colors.text, fontWeight: '600' },
+  dailyBookCard: { flexDirection: 'row', backgroundColor: colors.surfaceRaised, borderRadius: radius.md, overflow: 'hidden' },
   dailyBookImage: { width: 120, height: 180 },
   dailyBookInfo: { flex: 1, padding: 16 },
-  dailyBookTitle: { fontSize: 18, fontWeight: 'bold', color: '#FBF3F2', marginBottom: 4 },
-  dailyBookAuthor: { fontSize: 14, color: '#FBF3F2', opacity: 0.8, marginBottom: 8 },
-  dailyBookDescription: { fontSize: 14, lineHeight: 20, color: '#FBF3F2', opacity: 0.7, marginBottom: 12 },
+  dailyBookTitle: { fontSize: 18, lineHeight: 24, fontWeight: '700', color: colors.text, marginBottom: 4 },
+  dailyBookAuthor: { ...type.caption, color: colors.textMuted, marginBottom: 8 },
+  dailyBookDescription: { ...type.caption, color: colors.textMuted, marginBottom: 12 },
   dailyBookMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   ratingContainer: { flexDirection: 'row', alignItems: 'center' },
-  ratingText: { marginLeft: 4, fontSize: 14, color: '#FBF3F2', fontWeight: '500' },
+  ratingText: { marginLeft: 4, ...type.caption, color: colors.text, fontWeight: '600' },
   wishlistButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#032539',
+    ...touchTarget,
+    borderRadius: 24,
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#032539' },
-  loadingText: { marginTop: 12, fontSize: 16, color: '#FBF3F2' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  loadingText: { marginTop: 12, ...type.body, color: colors.text },
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#1C768F',
-    borderRadius: 8,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
-  errorText: { color: '#FBF3F2', textAlign: 'center', marginBottom: 12 },
-  retryButton: {
-    backgroundColor: '#FA991C',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+  errorText: { color: colors.text, ...type.body, textAlign: 'center', marginBottom: 12 },
+  catalogNotice: {
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
   },
-  retryButtonText: { color: '#FBF3F2', fontWeight: '600' },
+  catalogNoticeText: {
+    ...type.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: colors.primary,
+    minHeight: touchTarget.minHeight,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    borderRadius: radius.sm,
+  },
+  retryButtonText: { color: colors.onPrimary, ...type.label },
 });

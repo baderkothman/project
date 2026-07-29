@@ -1,24 +1,24 @@
-import { useEffect, Suspense, lazy } from 'react';
-import { Redirect, Stack } from 'expo-router';
+import { Suspense } from 'react';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { CartProvider } from '@/context/CartContext';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { useCachedResources } from '@/hooks/useCachedResources';
+import { useFrameworkReady } from '@/src/presentation/hooks/useFrameworkReady';
+import { CartProvider } from '@/src/presentation/providers/CartProvider';
+import { AuthProvider } from '@/src/presentation/providers/AuthProvider';
+import { useCachedResources } from '@/src/presentation/hooks/useCachedResources';
+import { colors } from '@/src/presentation/theme/tokens';
 import React from 'react';
 // Loading component for Suspense fallback
 function LoadingScreen() {
   return (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#FA991C" />
+      <ActivityIndicator size="large" color={colors.primary} />
       <Text style={styles.loadingText}>Loading...</Text>
     </View>
   );
 }
 
 function RootLayoutNav() {
-  const { session, loading } = useAuth();
   const isLoadingComplete = useCachedResources();
 
   if (!isLoadingComplete) {
@@ -32,26 +32,21 @@ function RootLayoutNav() {
           screenOptions={{ 
             headerShown: false,
             contentStyle: {
-              backgroundColor: '#032539'
+              backgroundColor: colors.background
             },
             animation: 'fade'
           }}
         >
-          {loading ? null : (
-            <>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
-              <Stack.Screen name="cart" options={{ presentation: 'modal' }} />
-              <Stack.Screen 
-                name="(auth)" 
-                options={{ 
-                  headerShown: false,
-                  presentation: 'modal',
-                  animation: 'fade'
-                }} 
-              />
-            </>
-          )}
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" options={{ title: 'Not found' }} />
+          <Stack.Screen
+            name="(auth)"
+            options={{
+              headerShown: false,
+              presentation: 'modal',
+              animation: 'fade'
+            }}
+          />
         </Stack>
       </Suspense>
     </CartProvider>
@@ -74,11 +69,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    color: '#FBF3F2',
+    color: colors.text,
     fontSize: 16,
   },
 });

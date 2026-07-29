@@ -15,8 +15,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter, Link } from 'expo-router';
 import { Send, ArrowLeft, Info } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { dataClient } from '@/src/infrastructure/local-api/client';
+import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 
 interface ChatItem {
@@ -151,7 +151,7 @@ export default function ChatDetail() {
       const chatSubscription = subscribeToChatUpdates();
 
       // Add Presence Tracking here
-      const presenceChannel = supabase.channel(`presence:${session?.user?.id}-${recipientId}`, {
+      const presenceChannel = dataClient.channel(`presence:${session?.user?.id}-${recipientId}`, {
         config: {
           presence: {
             key: session?.user?.id
@@ -186,7 +186,7 @@ export default function ChatDetail() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase.rpc(
+      const { data, error: fetchError } = await dataClient.rpc(
         'get_chat_items',
         {
           chat_user_id: session?.user?.id,
@@ -215,7 +215,7 @@ export default function ChatDetail() {
 
   const loadUserProfile = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await dataClient
         .from('profiles')
         .select('username, avatar_url, first_name, last_name')
         .eq('id', recipientId)
@@ -229,7 +229,7 @@ export default function ChatDetail() {
   };
 
   const subscribeToUpdates = () => {
-    const channel = supabase
+    const channel = dataClient
       .channel(`chat:${session?.user?.id}-${recipientId}`) // Unique channel name
       .on(
         'postgres_changes',
@@ -266,7 +266,7 @@ export default function ChatDetail() {
   };
 
   const subscribeToChatUpdates = () => {
-    return supabase
+    return dataClient
       .channel('shared_books_updates')
       .on(
         'postgres_changes',
@@ -337,7 +337,7 @@ export default function ChatDetail() {
 
     try {
       // Send to server
-      const { data, error } = await supabase
+      const { data, error } = await dataClient
         .from('messages')
         .insert({
           sender_id: session?.user?.id,
@@ -457,9 +457,11 @@ export default function ChatDetail() {
           styles.messagesList,
           { flexGrow: 1, justifyContent: 'flex-end' }
         ]}
-        onEndReached={() => {
+        onEndReached={async () => {
           if (hasMore && !loadingMore && lastTimestamp) {
-            loadChatItems();
+            setLoadingMore(true);
+            await loadChatItems();
+            setLoadingMore(false);
           }
         }}
         onEndReachedThreshold={0.5}
