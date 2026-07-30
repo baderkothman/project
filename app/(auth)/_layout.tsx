@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import React from 'react';
+import { colors } from '@/src/presentation/theme/tokens';
 
 export default function AuthLayout() {
   return (
@@ -9,7 +10,7 @@ export default function AuthLayout() {
         presentation: 'modal',
         animation: 'fade',
         contentStyle: {
-          backgroundColor: '#032539'
+          backgroundColor: colors.background
         }
       }}
     >

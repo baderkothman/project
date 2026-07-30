@@ -30,4 +30,5 @@ export const config = {
   uploadDirectory: path.resolve(process.cwd(), 'server/uploads'),
   publicApiUrl: process.env.PUBLIC_API_URL ?? `http://127.0.0.1:${port}`,
   isProduction,
+  isTest: process.env.NODE_ENV === 'test',
 } as const;

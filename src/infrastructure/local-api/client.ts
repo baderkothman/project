@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as secureStorage from '@/src/infrastructure/local-api/secure-storage';
 import { API_URL, WEBSOCKET_URL } from '@/src/shared/config/environment';
 import type { AppSession, AppUser } from '@/src/domain/models';
 
@@ -45,21 +45,22 @@ function emitAuth(event: AuthEvent, session: AppSession | null) {
 
 async function persistSession(session: AppSession | null) {
   currentSession = session;
-  if (session) await AsyncStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-  else await AsyncStorage.removeItem(SESSION_STORAGE_KEY);
+  if (session) await secureStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+  else await secureStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
 async function hydrateSession() {
   if (currentSession) return currentSession;
   if (!hydrationPromise) {
-    hydrationPromise = AsyncStorage.getItem(SESSION_STORAGE_KEY)
+    hydrationPromise = secureStorage
+      .getItem(SESSION_STORAGE_KEY)
       .then((value) => {
         if (!value) return null;
         try {
           currentSession = JSON.parse(value) as AppSession;
           return currentSession;
         } catch {
-          return AsyncStorage.removeItem(SESSION_STORAGE_KEY).then(() => null);
+          return secureStorage.removeItem(SESSION_STORAGE_KEY).then(() => null);
         }
       })
       .finally(() => {
@@ -421,6 +422,17 @@ const auth = {
       return { data: response.data, error: null };
     } catch (error) {
       return { data: { user: null }, error: toClientError(error) };
+    }
+  },
+
+  async deleteAccount() {
+    try {
+      await apiRequest<null>('/api/auth/account', { method: 'DELETE' });
+      await persistSession(null);
+      emitAuth('SIGNED_OUT', null);
+      return { error: null };
+    } catch (error) {
+      return { error: toClientError(error) };
     }
   },
 

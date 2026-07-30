@@ -16,6 +16,7 @@ import { ArrowLeft, CreditCard as Edit2, Trash2, BookOpen, Plus, Search } from '
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 const windowWidth = Dimensions.get('window').width;
 const GRID_SPACING = 16;
@@ -99,6 +100,8 @@ export default function LibraryScreen() {
       <TouchableOpacity
         style={styles.bookImageContainer}
         onPress={() => router.push(`/book/${item.id}`)}
+        accessibilityRole="button"
+        accessibilityLabel={`Open ${item.title}`}
       >
         <Image
           source={{ uri: item.images[0] }}
@@ -114,17 +117,21 @@ export default function LibraryScreen() {
         </View>
       </TouchableOpacity>
       <View style={styles.bookActions}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.actionButton, styles.editButton]}
           onPress={() => handleEdit(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`Edit ${item.title}`}
         >
-          <Edit2 size={16} color="#FBF3F2" />
+          <Edit2 size={16} color={colors.text} />
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.actionButton, styles.deleteButton]}
           onPress={() => handleDelete(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`Delete ${item.title}`}
         >
-          <Trash2 size={16} color="#FBF3F2" />
+          <Trash2 size={16} color={colors.text} />
         </TouchableOpacity>
       </View>
     </View>
@@ -133,7 +140,7 @@ export default function LibraryScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading your library...</Text>
       </View>
     );
@@ -149,25 +156,25 @@ export default function LibraryScreen() {
 
       <View style={styles.header}>
         <Link href="/(tabs)/profile" asChild>
-          <TouchableOpacity style={styles.backButton}>
-            <ArrowLeft size={24} color="#FBF3F2" />
+          <TouchableOpacity style={styles.backButton} accessibilityRole="button" accessibilityLabel="Go back">
+            <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         </Link>
         <Text style={styles.title}>My Library</Text>
         <Link href="/add" asChild>
-          <TouchableOpacity style={styles.addButton}>
-            <Plus size={24} color="#FBF3F2" />
+          <TouchableOpacity style={styles.addButton} accessibilityRole="button" accessibilityLabel="Add a book">
+            <Plus size={24} color={colors.text} />
           </TouchableOpacity>
         </Link>
       </View>
 
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color="#1C768F" style={styles.searchIcon} />
+          <Search size={20} color={colors.surface} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search your books..."
-            placeholderTextColor="#1C768F"
+            placeholderTextColor={colors.surface}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -189,10 +196,10 @@ export default function LibraryScreen() {
         columnWrapperStyle={styles.booksRow}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <BookOpen size={48} color="#FA991C" />
+            <BookOpen size={48} color={colors.primary} />
             <Text style={styles.emptyText}>No books listed yet</Text>
             <Link href="/add" asChild>
-              <TouchableOpacity style={styles.listButton}>
+              <TouchableOpacity style={styles.listButton} accessibilityRole="button" accessibilityLabel="List a book">
                 <Text style={styles.listButtonText}>List a Book</Text>
               </TouchableOpacity>
             </Link>
@@ -206,7 +213,7 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -215,15 +222,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -231,23 +238,23 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     paddingHorizontal: 16,
     height: 50,
@@ -257,8 +264,8 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#032539',
+    fontSize: fontSizes[16],
+    color: colors.background,
   },
   booksList: {
     padding: 16,
@@ -269,7 +276,7 @@ const styles = StyleSheet.create({
   bookCard: {
     width: ITEM_WIDTH,
     marginBottom: GRID_SPACING,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -279,7 +286,7 @@ const styles = StyleSheet.create({
   bookImage: {
     width: '100%',
     height: ITEM_WIDTH * 1.5,
-    backgroundColor: '#0D1B2A',
+    backgroundColor: colors.badgeBackground,
   },
   bookOverlay: {
     position: 'absolute',
@@ -293,19 +300,19 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   bookTitle: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   bookAuthor: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.8,
   },
   bookPrice: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
     marginTop: 4,
   },
   bookActions: {
@@ -321,10 +328,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
   },
   deleteButton: {
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.danger,
   },
   loadingContainer: {
     flex: 1,
@@ -333,18 +340,18 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     margin: 16,
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   emptyContainer: {
@@ -352,20 +359,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 18,
-    color: '#FBF3F2',
+    fontSize: fontSizes[18],
+    color: colors.text,
     marginTop: 16,
     marginBottom: 24,
   },
   listButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
   },
   listButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
 });

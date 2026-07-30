@@ -30,6 +30,7 @@ import {
   spacing,
   touchTarget,
   type,
+  fontSizes,
 } from '@/src/presentation/theme/tokens';
 
 // ==========================
@@ -393,7 +394,7 @@ const styles = StyleSheet.create({
   userBookInfo: { padding: 12 },
   userBookTitle: { ...type.label, color: colors.text, marginBottom: 4 },
   userBookAuthor: { ...type.caption, color: colors.textMuted, marginBottom: 8 },
-  userBookPrice: { fontSize: 18, lineHeight: 24, fontWeight: '700', color: colors.primary, marginBottom: 8 },
+  userBookPrice: { fontSize: fontSizes[18], lineHeight: 24, fontWeight: '700', color: colors.primary, marginBottom: 8 },
   userBookCondition: {
     backgroundColor: colors.background,
     paddingVertical: 4,
@@ -405,7 +406,7 @@ const styles = StyleSheet.create({
   dailyBookCard: { flexDirection: 'row', backgroundColor: colors.surfaceRaised, borderRadius: radius.md, overflow: 'hidden' },
   dailyBookImage: { width: 120, height: 180 },
   dailyBookInfo: { flex: 1, padding: 16 },
-  dailyBookTitle: { fontSize: 18, lineHeight: 24, fontWeight: '700', color: colors.text, marginBottom: 4 },
+  dailyBookTitle: { fontSize: fontSizes[18], lineHeight: 24, fontWeight: '700', color: colors.text, marginBottom: 4 },
   dailyBookAuthor: { ...type.caption, color: colors.textMuted, marginBottom: 8 },
   dailyBookDescription: { ...type.caption, color: colors.textMuted, marginBottom: 12 },
   dailyBookMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

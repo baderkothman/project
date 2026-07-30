@@ -17,6 +17,7 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Profile {
   username: string;
@@ -190,7 +191,7 @@ export default function EditProfileScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
@@ -200,20 +201,23 @@ export default function EditProfileScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Link href="/(tabs)/profile" asChild>
-          <TouchableOpacity style={styles.backButton}>
-            <ArrowLeft size={24} color="#FBF3F2" />
+          <TouchableOpacity style={styles.backButton} accessibilityRole="button" accessibilityLabel="Go back">
+            <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         </Link>
         <Text style={styles.title}>Edit Profile</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.saveButton, saving && styles.saveButtonDisabled]}
           onPress={handleSave}
           disabled={saving}
+          accessibilityRole="button"
+          accessibilityLabel={saving ? 'Saving profile' : 'Save profile'}
+          accessibilityState={{ disabled: saving }}
         >
           {saving ? (
-            <RefreshCw size={24} color="#FBF3F2" style={styles.spinningIcon} />
+            <RefreshCw size={24} color={colors.text} style={styles.spinningIcon} />
           ) : (
-            <Save size={24} color="#FBF3F2" />
+            <Save size={24} color={colors.text} />
           )}
         </TouchableOpacity>
       </View>
@@ -234,23 +238,25 @@ export default function EditProfileScreen() {
               }}
               style={styles.avatar}
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.changeAvatarButton, saving && styles.buttonDisabled]}
               onPress={pickImage}
               disabled={saving}
+              accessibilityRole="button"
+              accessibilityLabel="Change profile photo"
             >
-              <Camera size={20} color="#FBF3F2" />
+              <Camera size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <User size={20} color="#1C768F" style={styles.inputIcon} />
+            <User size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="First Name"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={profile?.first_name}
               onChangeText={(text) => 
                 setProfile(prev => prev ? { ...prev, first_name: text } : null)
@@ -259,11 +265,11 @@ export default function EditProfileScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <User size={20} color="#1C768F" style={styles.inputIcon} />
+            <User size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Last Name"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={profile?.last_name}
               onChangeText={(text) => 
                 setProfile(prev => prev ? { ...prev, last_name: text } : null)
@@ -272,11 +278,11 @@ export default function EditProfileScreen() {
           </View>
 
           <View style={[styles.inputContainer, styles.bioContainer]}>
-            <FileText size={20} color="#1C768F" style={styles.inputIcon} />
+            <FileText size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={[styles.input, styles.bioInput]}
               placeholder="Write something about yourself..."
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={profile?.bio || ''}
               onChangeText={(text) => 
                 setProfile(prev => prev ? { ...prev, bio: text } : null)
@@ -295,7 +301,7 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -304,28 +310,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   saveButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -341,12 +347,12 @@ const styles = StyleSheet.create({
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   avatarSection: {
@@ -361,7 +367,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   changeAvatarButton: {
     position: 'absolute',
@@ -370,11 +376,11 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FBF3F2',
+    borderColor: colors.text,
   },
   buttonDisabled: {
     opacity: 0.7,
@@ -385,7 +391,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     marginBottom: 16,
     paddingHorizontal: 16,
@@ -400,8 +406,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   bioInput: {
     height: 120,
@@ -411,11 +417,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
 });

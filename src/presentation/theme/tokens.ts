@@ -1,17 +1,22 @@
 export const colors = {
-  background: '#071D2A',
-  surface: '#102E3D',
+  background: '#032539',
+  surface: '#1C768F',
   surfaceRaised: '#173C4C',
   border: '#2C5869',
-  text: '#F7FAFC',
+  text: '#FBF3F2',
   textMuted: '#BCD0D8',
-  primary: '#F4A340',
+  primary: '#FA991C',
   primaryPressed: '#D98520',
   onPrimary: '#1F1405',
   info: '#69C5DD',
   success: '#5EC78A',
-  danger: '#FF7B72',
+  danger: '#DC2626',
   overlay: 'rgba(0, 0, 0, 0.56)',
+  disabled: '#666666',
+  onDark: '#FFFFFF',
+  badgeBackground: '#0D1B2A',
+  warningBackground: '#FEF3C7',
+  available: '#228B22',
 } as const;
 
 export const spacing = {
@@ -42,5 +47,23 @@ export const type = {
 export const touchTarget = {
   minHeight: 48,
   minWidth: 48,
+} as const;
+
+// Legacy screen-level font sizes, centralized so magic numbers aren't
+// scattered across StyleSheet.create() calls. Prefer `type.*` for new code.
+export const fontSizes = {
+  12: 12,
+  13: 13,
+  14: 14,
+  15: 15,
+  16: 16,
+  17: 17,
+  18: 18,
+  20: 20,
+  22: 22,
+  24: 24,
+  28: 28,
+  32: 32,
+  48: 48,
 } as const;
 

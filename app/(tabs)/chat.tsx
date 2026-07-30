@@ -15,6 +15,7 @@ import { Search, MessageSquare, UserPlus, UserMinus } from 'lucide-react-native'
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface ChatPreview {
   id: string;
@@ -283,6 +284,8 @@ export default function ChatScreen() {
       <TouchableOpacity
         style={styles.userInfo}
         onPress={() => router.push(`/chat/${item.id}`)}
+        accessibilityRole="button"
+        accessibilityLabel={`Message ${item.first_name} ${item.last_name}`}
       >
         <Image
           source={{ uri: item.avatar_url }}
@@ -305,15 +308,18 @@ export default function ChatScreen() {
           ]}
           onPress={() => toggleFollow(item.id)}
           disabled={followLoading[item.id]}
+          accessibilityRole="button"
+          accessibilityLabel={item.is_following ? `Unfollow ${item.first_name} ${item.last_name}` : `Follow ${item.first_name} ${item.last_name}`}
+          accessibilityState={{ selected: item.is_following, disabled: followLoading[item.id] }}
         >
           {followLoading[item.id] ? (
-            <ActivityIndicator size="small" color="#FBF3F2" />
+            <ActivityIndicator size="small" color={colors.text} />
           ) : (
             <>
               {item.is_following ? (
-                <UserMinus size={16} color="#FBF3F2" />
+                <UserMinus size={16} color={colors.text} />
               ) : (
-                <UserPlus size={16} color="#FBF3F2" />
+                <UserPlus size={16} color={colors.text} />
               )}
               <Text style={styles.followButtonText}>
                 {item.is_following ? 'Following' : 'Follow'}
@@ -325,8 +331,10 @@ export default function ChatScreen() {
         <TouchableOpacity
           style={styles.messageButton}
           onPress={() => router.push(`/chat/${item.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={`Open chat with ${item.first_name} ${item.last_name}`}
         >
-          <MessageSquare size={20} color="#FA991C" />
+          <MessageSquare size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
     </View>
@@ -336,9 +344,11 @@ export default function ChatScreen() {
     const displayName = `${item.first_name} ${item.last_name}`.trim() || item.username;
 
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.chatItem}
         onPress={() => handleChatPress(item.other_user_id)}
+        accessibilityRole="button"
+        accessibilityLabel={`Open chat with ${displayName}`}
       >
         <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
         <View style={styles.chatContent}>
@@ -372,7 +382,7 @@ export default function ChatScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading chats...</Text>
       </View>
     );
@@ -382,11 +392,11 @@ export default function ChatScreen() {
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color="#1C768F" style={styles.searchIcon} />
+          <Search size={20} color={colors.surface} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search users to message..."
-            placeholderTextColor="#1C768F"
+            placeholderTextColor={colors.surface}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -434,19 +444,19 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   searchContainer: {
     padding: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     paddingHorizontal: 16,
     height: 50,
@@ -456,18 +466,18 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#032539',
+    fontSize: fontSizes[16],
+    color: colors.background,
   },
   title: {
-    fontSize: 32,
+    fontSize: fontSizes[32],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     paddingHorizontal: 20,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
     paddingHorizontal: 20,
     marginTop: 4,
@@ -479,7 +489,7 @@ const styles = StyleSheet.create({
   searchResult: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     padding: 12,
     borderRadius: 12,
     marginBottom: 8,
@@ -490,19 +500,19 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   searchUserInfo: {
     flex: 1,
   },
   searchName: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     fontWeight: '500',
   },
   searchUsername: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.7,
   },
   chatList: {
@@ -512,7 +522,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 12,
     marginBottom: 8,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     alignItems: 'center',
   },
@@ -522,7 +532,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   chatContent: {
     flex: 1,
@@ -534,13 +544,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   userName: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   messageTime: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.7,
   },
   messagePreview: {
@@ -549,19 +559,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   messageText: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.8,
     flex: 1,
     marginRight: 8,
   },
   unreadMessage: {
-    color: '#FBF3F2',
+    color: colors.text,
     fontWeight: '500',
     opacity: 1,
   },
   unreadBadge: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -570,30 +580,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   unreadCount: {
-    color: '#032539',
-    fontSize: 12,
+    color: colors.background,
+    fontSize: fontSizes[12],
     fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     margin: 16,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   emptyContainer: {
@@ -601,13 +611,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.7,
     textAlign: 'center',
     marginTop: 8,
@@ -620,27 +630,27 @@ const styles = StyleSheet.create({
   followButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     gap: 4,
   },
   followingButton: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   followButtonText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
     fontWeight: '500',
   },
   messageButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },

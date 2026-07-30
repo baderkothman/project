@@ -14,6 +14,7 @@ import { ArrowLeft, UserMinus } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Profile {
   id: string;
@@ -81,6 +82,8 @@ export default function FollowingScreen() {
         <TouchableOpacity
           style={styles.followingContent}
           onPress={() => router.push(`/profile/${item.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${item.first_name} ${item.last_name}'s profile`}
         >
           <Image
             source={{ 
@@ -100,8 +103,10 @@ export default function FollowingScreen() {
           <TouchableOpacity
             style={styles.unfollowButton}
             onPress={() => handleUnfollow(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Unfollow ${item.first_name} ${item.last_name}`}
           >
-            <UserMinus size={20} color="#FBF3F2" />
+            <UserMinus size={20} color={colors.text} />
           </TouchableOpacity>
         )}
       </View>
@@ -118,8 +123,8 @@ export default function FollowingScreen() {
 
       <View style={styles.header}>
         <Link href="/(tabs)/profile" asChild>
-          <TouchableOpacity style={styles.backButton}>
-            <ArrowLeft size={24} color="#FBF3F2" />
+          <TouchableOpacity style={styles.backButton} accessibilityRole="button" accessibilityLabel="Go back">
+            <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         </Link>
         <Text style={styles.title}>Following</Text>
@@ -134,7 +139,7 @@ export default function FollowingScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FA991C" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Loading following...</Text>
         </View>
       ) : (
@@ -157,7 +162,7 @@ export default function FollowingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -166,22 +171,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -192,7 +197,7 @@ const styles = StyleSheet.create({
   followingCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 12,
     padding: 12,
@@ -208,29 +213,29 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   followingInfo: {
     flex: 1,
   },
   name: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 2,
   },
   username: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.7,
   },
   unfollowButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -241,18 +246,18 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     margin: 16,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   emptyContainer: {
@@ -260,8 +265,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     textAlign: 'center',
   },
 });

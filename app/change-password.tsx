@@ -12,6 +12,7 @@ import { Link, useRouter } from 'expo-router';
 import { ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -91,8 +92,10 @@ export default function ChangePasswordScreen() {
           <TouchableOpacity
             style={styles.backButton}
             onPress={handleBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <ArrowLeft size={24} color="#FBF3F2" />
+            <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.title}>Change password</Text>
           <View style={styles.placeholder} />
@@ -114,11 +117,11 @@ export default function ChangePasswordScreen() {
         )}
 
         <View style={styles.inputContainer}>
-          <Lock size={20} color="#1C768F" style={styles.inputIcon} />
+          <Lock size={20} color={colors.surface} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Current Password"
-            placeholderTextColor="#1C768F"
+            placeholderTextColor={colors.surface}
             value={oldPassword}
             onChangeText={setOldPassword}
             secureTextEntry={!showOldPassword}
@@ -126,21 +129,23 @@ export default function ChangePasswordScreen() {
           <TouchableOpacity
             style={styles.eyeIcon}
             onPress={() => setShowOldPassword(!showOldPassword)}
+            accessibilityRole="button"
+            accessibilityLabel={showOldPassword ? 'Hide current password' : 'Show current password'}
           >
             {showOldPassword ? (
-              <EyeOff size={20} color="#1C768F" />
+              <EyeOff size={20} color={colors.surface} />
             ) : (
-              <Eye size={20} color="#1C768F" />
+              <Eye size={20} color={colors.surface} />
             )}
           </TouchableOpacity>
         </View>
 
         <View style={styles.inputContainer}>
-          <Lock size={20} color="#1C768F" style={styles.inputIcon} />
+          <Lock size={20} color={colors.surface} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="New Password"
-            placeholderTextColor="#1C768F"
+            placeholderTextColor={colors.surface}
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry={!showNewPassword}
@@ -148,21 +153,23 @@ export default function ChangePasswordScreen() {
           <TouchableOpacity
             style={styles.eyeIcon}
             onPress={() => setShowNewPassword(!showNewPassword)}
+            accessibilityRole="button"
+            accessibilityLabel={showNewPassword ? 'Hide new password' : 'Show new password'}
           >
             {showNewPassword ? (
-              <EyeOff size={20} color="#1C768F" />
+              <EyeOff size={20} color={colors.surface} />
             ) : (
-              <Eye size={20} color="#1C768F" />
+              <Eye size={20} color={colors.surface} />
             )}
           </TouchableOpacity>
         </View>
 
         <View style={styles.inputContainer}>
-          <Lock size={20} color="#1C768F" style={styles.inputIcon} />
+          <Lock size={20} color={colors.surface} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Confirm New Password"
-            placeholderTextColor="#1C768F"
+            placeholderTextColor={colors.surface}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
@@ -170,11 +177,13 @@ export default function ChangePasswordScreen() {
           <TouchableOpacity
             style={styles.eyeIcon}
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            accessibilityRole="button"
+            accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
           >
             {showConfirmPassword ? (
-              <EyeOff size={20} color="#1C768F" />
+              <EyeOff size={20} color={colors.surface} />
             ) : (
-              <Eye size={20} color="#1C768F" />
+              <Eye size={20} color={colors.surface} />
             )}
           </TouchableOpacity>
         </View>
@@ -183,9 +192,12 @@ export default function ChangePasswordScreen() {
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleChangePassword}
           disabled={loading}
+          accessibilityRole="button"
+          accessibilityLabel={loading ? 'Changing password' : 'Change password'}
+          accessibilityState={{ disabled: loading }}
         >
           {loading ? (
-            <ActivityIndicator color="#FBF3F2" />
+            <ActivityIndicator color={colors.text} />
           ) : (
             <Text style={styles.buttonText}>Change Password</Text>
           )}
@@ -198,7 +210,7 @@ export default function ChangePasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -207,22 +219,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -231,15 +243,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   errorContainer: {
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.danger,
     padding: 16,
     borderRadius: 8,
     marginBottom: 20,
   },
   errorText: {
-    color: '#FBF3F2',
+    color: colors.text,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: fontSizes[14],
   },
   successContainer: {
     backgroundColor: '#059669',
@@ -248,14 +260,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   successText: {
-    color: '#FBF3F2',
+    color: colors.text,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: fontSizes[14],
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     marginBottom: 16,
     paddingHorizontal: 16,
@@ -266,14 +278,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   eyeIcon: {
     padding: 8,
   },
   button: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     height: 50,
     borderRadius: 12,
     justifyContent: 'center',
@@ -284,8 +296,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
 });

@@ -93,14 +93,24 @@ export function requireAuth(
   });
 }
 
-export async function verifyCredentials(email: string, password: string) {
+const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60_000;
+
+export type LoginResult =
+  | { status: 'ok'; user: { id: string; email: string; email_confirmed_at: string } }
+  | { status: 'invalid' }
+  | { status: 'locked'; lockedUntil: Date };
+
+export async function verifyCredentials(email: string, password: string): Promise<LoginResult> {
   const result = await pool.query<{
     id: string;
     email: string;
     password_hash: string;
     email_confirmed_at: string;
+    failed_login_attempts: number;
+    locked_until: string | null;
   }>(
-    `SELECT id, email, password_hash, email_confirmed_at
+    `SELECT id, email, password_hash, email_confirmed_at, failed_login_attempts, locked_until
      FROM users
      WHERE lower(email) = lower($1)
      LIMIT 1`,
@@ -108,10 +118,40 @@ export async function verifyCredentials(email: string, password: string) {
   );
 
   const user = result.rows[0];
-  if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-    return null;
+  if (!user) {
+    // Run a hash comparison anyway so a nonexistent email is not distinguishable by timing.
+    await bcrypt.compare(password, '$2a$12$invalidsaltinvalidsaltinvalidsaltinvalidsalu');
+    return { status: 'invalid' };
   }
-  return user;
+
+  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+    return { status: 'locked', lockedUntil: new Date(user.locked_until) };
+  }
+
+  const passwordMatches = await bcrypt.compare(password, user.password_hash);
+  if (!passwordMatches) {
+    const attempts = user.failed_login_attempts + 1;
+    const lockedUntil = attempts >= MAX_FAILED_LOGIN_ATTEMPTS
+      ? new Date(Date.now() + LOCKOUT_DURATION_MS)
+      : null;
+    await pool.query(
+      'UPDATE users SET failed_login_attempts = $1, locked_until = $2 WHERE id = $3',
+      [attempts, lockedUntil, user.id],
+    );
+    return lockedUntil ? { status: 'locked', lockedUntil } : { status: 'invalid' };
+  }
+
+  if (user.failed_login_attempts > 0 || user.locked_until) {
+    await pool.query(
+      'UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = $1',
+      [user.id],
+    );
+  }
+
+  return {
+    status: 'ok',
+    user: { id: user.id, email: user.email, email_confirmed_at: user.email_confirmed_at },
+  };
 }
 
 export function sanitizeUsername(email: string) {

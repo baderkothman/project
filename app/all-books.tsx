@@ -13,6 +13,7 @@ import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, BookOpen } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Book {
   id: string;
@@ -58,6 +59,8 @@ export default function AllBooksScreen() {
     <TouchableOpacity
       style={styles.bookCard}
       onPress={() => router.push(`/book/${item.id}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${item.title}`}
     >
       <Image
         source={{ uri: item.images[0] }}
@@ -88,11 +91,13 @@ export default function AllBooksScreen() {
       />
 
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>All Books</Text>
         <View style={styles.placeholder} />
@@ -106,7 +111,7 @@ export default function AllBooksScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FA991C" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Loading books...</Text>
         </View>
       ) : (
@@ -119,7 +124,7 @@ export default function AllBooksScreen() {
           columnWrapperStyle={styles.booksRow}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <BookOpen size={48} color="#FA991C" />
+              <BookOpen size={48} color={colors.primary} />
               <Text style={styles.emptyText}>No books listed yet</Text>
             </View>
           }
@@ -132,7 +137,7 @@ export default function AllBooksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -141,22 +146,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
   },
   bookCard: {
     width: '48%',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
@@ -177,39 +182,39 @@ const styles = StyleSheet.create({
   bookImage: {
     width: '100%',
     aspectRatio: 3/4,
-    backgroundColor: '#0D1B2A',
+    backgroundColor: colors.badgeBackground,
   },
   bookInfo: {
     padding: 12,
   },
   bookTitle: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 8,
   },
   bookPrice: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
     marginBottom: 8,
   },
   bookCondition: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
     alignSelf: 'flex-start',
   },
   conditionText: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     fontWeight: '500',
   },
   loadingContainer: {
@@ -219,18 +224,18 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     margin: 16,
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   emptyContainer: {
@@ -238,8 +243,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     textAlign: 'center',
     marginTop: 16,
   },

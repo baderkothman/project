@@ -18,6 +18,7 @@ import { Send, ArrowLeft, Info } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface ChatItem {
   id: string;
@@ -66,7 +67,8 @@ function AnimatedChatItem({ item, isUserItem, handleBookPreview }: {
             isUserItem ? styles.userSharedBook : styles.otherSharedBook
           ]}
           onPress={() => handleBookPreview(item.book_data!.book_id)}
-
+          accessibilityRole="button"
+          accessibilityLabel={`Open shared book ${item.book_data.title}`}
         >
           <View style={styles.sharedBookContent}>
             <Image
@@ -387,7 +389,7 @@ export default function ChatDetail() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading messages...</Text>
       </View>
     );
@@ -405,21 +407,26 @@ export default function ChatDetail() {
     >
       <View style={styles.userBar}>
         <Link href="/(tabs)/chat" asChild>
-          <TouchableOpacity style={styles.backButton}>
-            <ArrowLeft size={24} color="#FBF3F2" />
+          <TouchableOpacity style={styles.backButton} accessibilityRole="button" accessibilityLabel="Go back">
+            <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         </Link>
         <TouchableOpacity
           style={styles.userInfo}
           onPress={handleUserPress}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${displayName}'s profile`}
         >
           <Text style={styles.userName}>{displayName}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.infoButton}
           onPress={() => setShowUserInfo(!showUserInfo)}
+          accessibilityRole="button"
+          accessibilityLabel="Toggle user info"
+          accessibilityState={{ expanded: showUserInfo }}
         >
-          <Info size={24} color="#FBF3F2" />
+          <Info size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -427,6 +434,8 @@ export default function ChatDetail() {
         <TouchableOpacity
           style={styles.userInfoPanel}
           onPress={handleUserPress}
+          accessibilityRole="button"
+          accessibilityLabel={`View ${displayName}'s profile`}
         >
           <Image
             source={{
@@ -467,7 +476,7 @@ export default function ChatDetail() {
         onEndReachedThreshold={0.5}
         ListHeaderComponent={loadingMore ? (
           <View style={styles.loadingMore}>
-            <ActivityIndicator size="small" color="#FA991C" />
+            <ActivityIndicator size="small" color={colors.primary} />
           </View>
         ) : null}
         onContentSizeChange={() => {
@@ -484,7 +493,7 @@ export default function ChatDetail() {
           value={newMessage}
           onChangeText={setNewMessage}
           placeholder="Type a message..."
-          placeholderTextColor="#1C768F"
+          placeholderTextColor={colors.surface}
           multiline
           maxLength={500}
           returnKeyType="send"
@@ -497,8 +506,11 @@ export default function ChatDetail() {
           ]}
           onPress={handleSend}
           disabled={!newMessage.trim()}
+          accessibilityRole="button"
+          accessibilityLabel="Send message"
+          accessibilityState={{ disabled: !newMessage.trim() }}
         >
-          <Send size={20} color="#FBF3F2" />
+          <Send size={20} color={colors.text} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -508,17 +520,17 @@ export default function ChatDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   userBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'ios' ? 50 : 20,
     paddingBottom: 15,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     padding: 8,
@@ -529,19 +541,19 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   userName: {
-    color: '#FBF3F2',
-    fontSize: 18,
+    color: colors.text,
+    fontSize: fontSizes[18],
     fontWeight: '600',
   },
   infoButton: {
     padding: 8,
   },
   userInfoPanel: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     padding: 20,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   userAvatar: {
     width: 80,
@@ -549,29 +561,29 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 12,
     borderWidth: 3,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   userFullName: {
-    color: '#FBF3F2',
-    fontSize: 20,
+    color: colors.text,
+    fontSize: fontSizes[20],
     fontWeight: '600',
     marginBottom: 4,
   },
   userUsername: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     opacity: 0.8,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   loadingMore: {
     padding: 16,
@@ -579,13 +591,13 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     padding: 12,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     margin: 12,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   messagesList: {
@@ -598,36 +610,36 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   userMessage: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     alignSelf: 'flex-end',
     borderBottomRightRadius: 4,
   },
   otherMessage: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     alignSelf: 'flex-start',
     borderBottomLeftRadius: 4,
   },
   messageText: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     lineHeight: 22,
   },
   userMessageText: {
-    color: '#032539',
+    color: colors.background,
   },
   otherMessageText: {
-    color: '#FBF3F2',
+    color: colors.text,
   },
   timestamp: {
-    fontSize: 12,
+    fontSize: fontSizes[12],
     marginTop: 4,
     alignSelf: 'flex-end',
   },
   userTimestamp: {
-    color: '#032539',
+    color: colors.background,
     opacity: 0.8,
   },
   otherTimestamp: {
-    color: '#FBF3F2',
+    color: colors.text,
     opacity: 0.7,
   },
   sharedBookCard: {
@@ -637,12 +649,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   userSharedBook: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     alignSelf: 'flex-end',
     borderBottomRightRadius: 4,
   },
   otherSharedBook: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     alignSelf: 'flex-start',
     borderBottomLeftRadius: 4,
   },
@@ -660,15 +672,15 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   sharedBookTitle: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '600',
     marginBottom: 8,
   },
   userSharedBookText: {
-    color: '#032539',
+    color: colors.background,
   },
   otherSharedBookText: {
-    color: '#FBF3F2',
+    color: colors.text,
   },
   sharedBookAction: {
     flexDirection: 'row',
@@ -676,30 +688,30 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   sharedBookActionText: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '500',
   },
   inputContainer: {
     flexDirection: 'row',
     padding: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: '#1C768F',
+    borderTopColor: colors.surface,
     alignItems: 'flex-end',
   },
   input: {
     flex: 1,
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginRight: 8,
     maxHeight: 100,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   sendButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -707,6 +719,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   }
 });

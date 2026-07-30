@@ -11,6 +11,7 @@ import { Link } from 'expo-router';
 import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, MessageSquare, ShoppingBag, Settings, CircleHelp as HelpCircle, User } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Section {
   id: string;
@@ -178,8 +179,10 @@ export default function HelpCenter() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Help Center</Text>
         <View style={styles.placeholder} />
@@ -201,9 +204,12 @@ export default function HelpCenter() {
                   isExpanded && styles.sectionHeaderActive
                 ]}
                 onPress={() => toggleSection(section.id)}
+                accessibilityRole="button"
+                accessibilityLabel={section.title}
+                accessibilityState={{ expanded: isExpanded }}
               >
                 <View style={styles.sectionTitle}>
-                  <Icon size={24} color={isExpanded ? '#FA991C' : '#FBF3F2'} />
+                  <Icon size={24} color={isExpanded ? colors.primary : colors.text} />
                   <Text style={[
                     styles.sectionTitleText,
                     isExpanded && styles.sectionTitleTextActive
@@ -212,9 +218,9 @@ export default function HelpCenter() {
                   </Text>
                 </View>
                 {isExpanded ? (
-                  <ChevronUp size={24} color="#FA991C" />
+                  <ChevronUp size={24} color={colors.primary} />
                 ) : (
-                  <ChevronDown size={24} color="#FBF3F2" />
+                  <ChevronDown size={24} color={colors.text} />
                 )}
               </TouchableOpacity>
 
@@ -232,6 +238,9 @@ export default function HelpCenter() {
                             isItemExpanded && styles.itemHeaderActive
                           ]}
                           onPress={() => toggleItem(itemId)}
+                          accessibilityRole="button"
+                          accessibilityLabel={item.question}
+                          accessibilityState={{ expanded: isItemExpanded }}
                         >
                           <Text style={[
                             styles.itemQuestion,
@@ -240,9 +249,9 @@ export default function HelpCenter() {
                             {item.question}
                           </Text>
                           {isItemExpanded ? (
-                            <ChevronUp size={20} color="#FA991C" />
+                            <ChevronUp size={20} color={colors.primary} />
                           ) : (
-                            <ChevronDown size={20} color="#1C768F" />
+                            <ChevronDown size={20} color={colors.surface} />
                           )}
                         </TouchableOpacity>
                         {isItemExpanded && (
@@ -266,7 +275,7 @@ export default function HelpCenter() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -275,22 +284,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -308,14 +317,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 12,
   },
   sectionHeaderActive: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   sectionTitle: {
     flexDirection: 'row',
@@ -323,22 +332,22 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sectionTitleText: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   sectionTitleTextActive: {
-    color: '#FA991C',
+    color: colors.primary,
   },
   sectionContent: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     marginTop: 2,
     borderRadius: 12,
     overflow: 'hidden',
   },
   item: {
     borderBottomWidth: 1,
-    borderBottomColor: '#032539',
+    borderBottomColor: colors.background,
   },
   itemHeader: {
     flexDirection: 'row',
@@ -347,22 +356,22 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   itemHeaderActive: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   itemQuestion: {
     flex: 1,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     marginRight: 8,
   },
   itemQuestionActive: {
-    color: '#FA991C',
+    color: colors.primary,
     fontWeight: '500',
   },
   itemAnswer: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     lineHeight: 20,
-    color: '#FBF3F2',
+    color: colors.text,
     opacity: 0.8,
     padding: 16,
     paddingTop: 0,

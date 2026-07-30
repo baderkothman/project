@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { CreditCard, Check, ArrowLeft } from 'lucide-react-native';
 import { useStripe } from '@/src/presentation/hooks/useStripe';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 export const STRIPE_PRODUCTS = {
   plan2_monthly: {
@@ -47,19 +48,19 @@ export default function SubscriptionScreen() {
   const renderPlanFeatures = () => (
     <>
       <View style={styles.featureItem}>
-        <Check size={20} color="#FA991C" />
+        <Check size={20} color={colors.primary} />
         <Text style={styles.featureText}>Free browsing</Text>
       </View>
       <View style={styles.featureItem}>
-        <Check size={20} color="#FA991C" />
+        <Check size={20} color={colors.primary} />
         <Text style={styles.featureText}>Offline access</Text>
       </View>
       <View style={styles.featureItem}>
-        <Check size={20} color="#FA991C" />
+        <Check size={20} color={colors.primary} />
         <Text style={styles.featureText}>Exclusive access for clubs</Text>
       </View>
       <View style={styles.featureItem}>
-        <Check size={20} color="#FA991C" />
+        <Check size={20} color={colors.primary} />
         <Text style={styles.featureText}>Quote generation</Text>
       </View>
     </>
@@ -68,11 +69,13 @@ export default function SubscriptionScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Subscription</Text>
         <View style={styles.placeholder} />
@@ -85,7 +88,7 @@ export default function SubscriptionScreen() {
         {Object.entries(STRIPE_PRODUCTS).map(([planId, plan]) => (
           <View key={planId} style={styles.planCard}>
             <View style={styles.planHeader}>
-              <CreditCard size={32} color="#FA991C" />
+              <CreditCard size={32} color={colors.primary} />
               <Text style={styles.planName}>{plan.name}</Text>
             </View>
 
@@ -102,6 +105,9 @@ export default function SubscriptionScreen() {
               style={[styles.subscribeButton, loading && styles.buttonDisabled]}
               onPress={() => handleSubscribe(planId as keyof typeof STRIPE_PRODUCTS)}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel={`Subscribe to ${plan.name}`}
+              accessibilityState={{ disabled: loading }}
             >
               <Text style={styles.subscribeButtonText}>
                 {loading ? 'Processing...' : 'Subscribe Now'}
@@ -117,7 +123,7 @@ export default function SubscriptionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -126,22 +132,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -150,21 +156,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionHeader: {
-    fontSize: 28,
+    fontSize: fontSizes[28],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     textAlign: 'center',
     marginBottom: 8,
   },
   subheader: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
     textAlign: 'center',
     marginBottom: 32,
   },
   planCard: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 24,
     marginBottom: 20,
@@ -179,19 +185,19 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   planName: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   planPrice: {
-    fontSize: 48,
+    fontSize: fontSizes[48],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
     marginBottom: 24,
   },
   perPeriod: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
   },
   features: {
@@ -204,11 +210,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   subscribeButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -217,8 +223,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   subscribeButtonText: {
-    color: '#FBF3F2',
-    fontSize: 18,
+    color: colors.text,
+    fontSize: fontSizes[18],
     fontWeight: '600',
   },
 });

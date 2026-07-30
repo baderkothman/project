@@ -9,14 +9,14 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { Stack, Link, useRouter } from 'expo-router';
+import { Stack, Link, useRouter, useFocusEffect } from 'expo-router';
 import { ArrowLeft, Heart, Trash2, WifiOff } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { getGoogleBook } from '@/src/application/services/google-books';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
-import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Book {
   id: string;
@@ -174,36 +174,42 @@ export default function WishlistScreen() {
       item.images[0];
 
     return (
-      <TouchableOpacity
-        style={styles.bookCard}
-        onPress={() => router.push(isGoogleBook ? `/google-book/${item.id}` : `/book/${item.id}`)}
-      >
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.bookImage}
-          resizeMode="cover"
-        />
-        <View style={styles.bookInfo}>
-          <Text style={styles.bookTitle} numberOfLines={2}>{title}</Text>
-          <Text style={styles.bookAuthor} numberOfLines={1}>{author}</Text>
-          {!isGoogleBook && (
-            <Text style={styles.bookPrice}>${item.price.toFixed(2)}</Text>
-          )}
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => removeFromWishlist(item.id, isGoogleBook)}
-          >
-            <Trash2 size={20} color="#FBF3F2" />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.bookCard}>
+        <TouchableOpacity
+          style={styles.bookContentArea}
+          onPress={() => router.push(isGoogleBook ? `/google-book/${item.id}` : `/book/${item.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={`Open ${title}`}
+        >
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.bookImage}
+            resizeMode="cover"
+          />
+          <View style={styles.bookInfo}>
+            <Text style={styles.bookTitle} numberOfLines={2}>{title}</Text>
+            <Text style={styles.bookAuthor} numberOfLines={1}>{author}</Text>
+            {!isGoogleBook && (
+              <Text style={styles.bookPrice}>${item.price.toFixed(2)}</Text>
+            )}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={() => removeFromWishlist(item.id, isGoogleBook)}
+          accessibilityRole="button"
+          accessibilityLabel={`Remove ${title} from wishlist`}
+        >
+          <Trash2 size={20} color={colors.text} />
+        </TouchableOpacity>
+      </View>
     );
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading wishlist...</Text>
       </View>
     );
@@ -212,8 +218,8 @@ export default function WishlistScreen() {
  return (
   <View style={styles.container}>
     <View style={styles.topBar}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <ArrowLeft size={24} color="#FBF3F2" />
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Go back">
+        <ArrowLeft size={24} color={colors.text} />
       </TouchableOpacity>
       <Text style={styles.pageTitle}>My Wishlist</Text>
       <View style={styles.placeholder} />
@@ -221,9 +227,9 @@ export default function WishlistScreen() {
 
       {error && (
         <View style={[styles.errorContainer, error.isNetwork && styles.networkErrorContainer]}>
-          {error.isNetwork && <WifiOff size={24} color="#032539" style={styles.errorIcon} />}
+          {error.isNetwork && <WifiOff size={24} color={colors.background} style={styles.errorIcon} />}
           <Text style={styles.errorText}>{error.message}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchWishlistBooks}>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchWishlistBooks} accessibilityRole="button" accessibilityLabel="Try again">
             <Text style={styles.retryButtonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
@@ -237,13 +243,13 @@ export default function WishlistScreen() {
         ListEmptyComponent={
           !error ? (
             <View style={styles.emptyContainer}>
-              <Heart size={48} color="#FA991C" />
+              <Heart size={48} color={colors.primary} />
               <Text style={styles.emptyText}>Your wishlist is empty</Text>
               <Text style={styles.emptySubtext}>
                 Add books you love to your wishlist
               </Text>
               <Link href="/(tabs)/browse" asChild>
-                <TouchableOpacity style={styles.browseButton}>
+                <TouchableOpacity style={styles.browseButton} accessibilityRole="button" accessibilityLabel="Browse books">
                   <Text style={styles.browseButtonText}>Browse Books</Text>
                 </TouchableOpacity>
               </Link>
@@ -258,7 +264,7 @@ export default function WishlistScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   topBar: {
     flexDirection: 'row',
@@ -267,22 +273,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   pageTitle: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -291,11 +297,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   bookCard: {
-    flexDirection: 'row',
-    backgroundColor: '#1C768F',
+    position: 'relative',
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
+  },
+  bookContentArea: {
+    flexDirection: 'row',
+    backgroundColor: colors.surface,
   },
   bookImage: {
     width: 100,
@@ -304,24 +313,23 @@ const styles = StyleSheet.create({
   bookInfo: {
     flex: 1,
     padding: 16,
-    position: 'relative',
   },
   bookTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 8,
   },
   bookPrice: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
   },
   removeButton: {
     position: 'absolute',
@@ -330,7 +338,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.danger,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -341,39 +349,39 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     margin: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   networkErrorContainer: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: colors.warningBackground,
     borderWidth: 1,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   errorIcon: {
     marginBottom: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
     marginBottom: 12,
   },
   retryButton: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
   },
   retryButtonText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
     fontWeight: '600',
   },
   emptyContainer: {
@@ -383,28 +391,28 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   emptyText: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtext: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 24,
     textAlign: 'center',
   },
   browseButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 20,
   },
   browseButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
 });

@@ -17,6 +17,7 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import 'react-native-url-polyfill/auto';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface FormData {
   firstName: string;
@@ -177,12 +178,12 @@ export default function SignUpScreen() {
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <User size={20} color="#1C768F" style={styles.inputIcon} />
+            <User size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="First name"
               style={styles.input}
               placeholder="First Name"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.firstName}
               onChangeText={(text) =>
                 setFormData({ ...formData, firstName: text })
@@ -194,12 +195,12 @@ export default function SignUpScreen() {
           )}
 
           <View style={styles.inputContainer}>
-            <User size={20} color="#1C768F" style={styles.inputIcon} />
+            <User size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="Last name"
               style={styles.input}
               placeholder="Last Name"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.lastName}
               onChangeText={(text) =>
                 setFormData({ ...formData, lastName: text })
@@ -211,12 +212,12 @@ export default function SignUpScreen() {
           )}
 
           <View style={styles.inputContainer}>
-            <Mail size={20} color="#1C768F" style={styles.inputIcon} />
+            <Mail size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="Email address"
               style={styles.input}
               placeholder="Email Address"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.email}
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               autoCapitalize="none"
@@ -229,12 +230,12 @@ export default function SignUpScreen() {
           )}
 
           <View style={styles.inputContainer}>
-            <Lock size={20} color="#1C768F" style={styles.inputIcon} />
+            <Lock size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="Password"
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.password}
               onChangeText={(text) =>
                 setFormData({ ...formData, password: text })
@@ -248,12 +249,12 @@ export default function SignUpScreen() {
           )}
 
           <View style={styles.inputContainer}>
-            <Lock size={20} color="#1C768F" style={styles.inputIcon} />
+            <Lock size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="Confirm password"
               style={styles.input}
               placeholder="Confirm Password"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.confirmPassword}
               onChangeText={(text) =>
                 setFormData({ ...formData, confirmPassword: text })
@@ -267,7 +268,7 @@ export default function SignUpScreen() {
 
           {Platform.OS === 'web' ? (
             <View style={styles.inputContainer}>
-              <Calendar size={20} color="#1C768F" style={styles.inputIcon} />
+              <Calendar size={20} color={colors.surface} style={styles.inputIcon} />
               <input
                 type="date"
                 value={formData.birthdate.toISOString().split('T')[0]}
@@ -283,7 +284,7 @@ export default function SignUpScreen() {
                 accessibilityLabel={`Birthdate, ${formData.birthdate.toLocaleDateString()}`}
                 style={styles.inputContainer}
                 onPress={() => setShowDatePicker(true)}>
-                <Calendar size={20} color="#1C768F" style={styles.inputIcon} />
+                <Calendar size={20} color={colors.surface} style={styles.inputIcon} />
                 <Text style={styles.dateText}>
                   {formData.birthdate.toLocaleDateString()}
                 </Text>
@@ -310,10 +311,10 @@ export default function SignUpScreen() {
             onPress={handleSignUp}
             disabled={loading}>
             {loading ? (
-              <ActivityIndicator color="#FBF3F2" />
+              <ActivityIndicator color={colors.text} />
             ) : (
               <>
-                <UserPlus size={20} color="#FBF3F2" />
+                <UserPlus size={20} color={colors.text} />
                 <Text style={styles.buttonText}>Create Account</Text>
               </>
             )}
@@ -321,7 +322,7 @@ export default function SignUpScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account?</Text>
-            <TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Sign in">
               <Link href="/login">
                 <Text style={styles.footerLink}> Sign In</Text>
               </Link>
@@ -336,7 +337,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -347,23 +348,23 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(3, 37, 57, 0.7)',
   },
   title: {
-    fontSize: 32,
+    fontSize: fontSizes[32],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#FBF3F2',
+    fontSize: fontSizes[18],
+    color: colors.text,
     opacity: 0.9,
   },
   form: {
@@ -372,7 +373,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     marginBottom: 12,
     paddingHorizontal: 16,
@@ -383,24 +384,24 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   webDateInput: {
     flex: 1,
     borderWidth: 0,
-    fontSize: 16,
-    color: '#032539',
+    fontSize: fontSizes[16],
+    color: colors.background,
     fontFamily: 'inherit',
   },
   dateText: {
     flex: 1,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   errorText: {
-    color: '#FA991C',
-    fontSize: 12,
+    color: colors.primary,
+    fontSize: fontSizes[12],
     marginBottom: 12,
     marginLeft: 4,
   },
@@ -408,7 +409,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     marginTop: 8,
@@ -417,8 +418,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -429,12 +430,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   footerLink: {
-    color: '#FA991C',
-    fontSize: 14,
+    color: colors.primary,
+    fontSize: fontSizes[14],
     fontWeight: '600',
     marginLeft: 4,
   },
@@ -445,26 +446,26 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   confirmationTitle: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
     marginBottom: 16,
   },
   confirmationText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     textAlign: 'center',
     marginBottom: 24,
   },
   loginButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,
   },
   loginButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
 });

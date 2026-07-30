@@ -6,7 +6,7 @@ import { useFrameworkReady } from '@/src/presentation/hooks/useFrameworkReady';
 import { CartProvider } from '@/src/presentation/providers/CartProvider';
 import { AuthProvider } from '@/src/presentation/providers/AuthProvider';
 import { useCachedResources } from '@/src/presentation/hooks/useCachedResources';
-import { colors } from '@/src/presentation/theme/tokens';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 import React from 'react';
 // Loading component for Suspense fallback
 function LoadingScreen() {
@@ -74,6 +74,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     color: colors.text,
-    fontSize: 16,
+    fontSize: fontSizes[16],
   },
 });

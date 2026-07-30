@@ -17,6 +17,7 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Book {
   id: string;
@@ -253,7 +254,7 @@ export default function EditBookScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading book details...</Text>
       </View>
     );
@@ -266,6 +267,8 @@ export default function EditBookScreen() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
@@ -276,19 +279,24 @@ export default function EditBookScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Edit Book</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.saveButton, saving && styles.buttonDisabled]}
           onPress={handleSave}
           disabled={saving}
+          accessibilityRole="button"
+          accessibilityLabel={saving ? 'Saving book' : 'Save book'}
+          accessibilityState={{ disabled: saving }}
         >
-          <Save size={24} color="#FBF3F2" />
+          <Save size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -303,33 +311,33 @@ export default function EditBookScreen() {
           <Text style={styles.sectionTitle}>Book Details</Text>
 
           <View style={styles.inputContainer}>
-            <BookOpen size={20} color="#1C768F" style={styles.inputIcon} />
+            <BookOpen size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Book Title"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.title}
               onChangeText={(text) => setBook({ ...book, title: text })}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <User size={20} color="#1C768F" style={styles.inputIcon} />
+            <User size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Author"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.author}
               onChangeText={(text) => setBook({ ...book, author: text })}
             />
           </View>
 
           <View style={[styles.inputContainer, styles.textAreaContainer]}>
-            <Info size={20} color="#1C768F" style={styles.inputIcon} />
+            <Info size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Description"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.description}
               onChangeText={(text) => setBook({ ...book, description: text })}
               multiline
@@ -353,10 +361,13 @@ export default function EditBookScreen() {
                   book.category === category && styles.categoryButtonActive
                 ]}
                 onPress={() => setBook({ ...book, category })}
+                accessibilityRole="radio"
+                accessibilityLabel={category}
+                accessibilityState={{ checked: book.category === category }}
               >
                 <LayoutGrid 
                   size={16} 
-                  color={book.category === category ? '#FBF3F2' : '#1C768F'} 
+                  color={book.category === category ? colors.text : colors.surface} 
                 />
                 <Text 
                   style={[
@@ -387,10 +398,13 @@ export default function EditBookScreen() {
                   book.language === lang.code && styles.optionButtonActive
                 ]}
                 onPress={() => setBook({ ...book, language: lang.code })}
+                accessibilityRole="radio"
+                accessibilityLabel={lang.name}
+                accessibilityState={{ checked: book.language === lang.code }}
               >
                 <Languages 
                   size={16} 
-                  color={book.language === lang.code ? '#FBF3F2' : '#1C768F'} 
+                  color={book.language === lang.code ? colors.text : colors.surface} 
                 />
                 <Text 
                   style={[
@@ -417,10 +431,13 @@ export default function EditBookScreen() {
                   book.condition === condition && styles.optionButtonActive
                 ]}
                 onPress={() => setBook({ ...book, condition })}
+                accessibilityRole="radio"
+                accessibilityLabel={condition}
+                accessibilityState={{ checked: book.condition === condition }}
               >
                 <Info 
                   size={16} 
-                  color={book.condition === condition ? '#FBF3F2' : '#1C768F'} 
+                  color={book.condition === condition ? colors.text : colors.surface} 
                 />
                 <Text 
                   style={[
@@ -439,11 +456,11 @@ export default function EditBookScreen() {
           <Text style={styles.sectionTitle}>Additional Information</Text>
 
           <View style={styles.inputContainer}>
-            <DollarSign size={20} color="#1C768F" style={styles.inputIcon} />
+            <DollarSign size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Price"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.price.toString()}
               onChangeText={(text) => setBook({ ...book, price: parseFloat(text) || 0 })}
               keyboardType="numeric"
@@ -451,11 +468,11 @@ export default function EditBookScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <BookOpen size={20} color="#1C768F" style={styles.inputIcon} />
+            <BookOpen size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Number of Pages"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.pages?.toString() || ''}
               onChangeText={(text) => setBook({ ...book, pages: parseInt(text) || null })}
               keyboardType="numeric"
@@ -463,22 +480,22 @@ export default function EditBookScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Info size={20} color="#1C768F" style={styles.inputIcon} />
+            <Info size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="ISBN (optional)"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.isbn || ''}
               onChangeText={(text) => setBook({ ...book, isbn: text })}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Globe2 size={20} color="#1C768F" style={styles.inputIcon} />
+            <Globe2 size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Location"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={book.location || ''}
               onChangeText={(text) => setBook({ ...book, location: text })}
             />
@@ -496,17 +513,21 @@ export default function EditBookScreen() {
                 <TouchableOpacity
                   style={styles.removeImageButton}
                   onPress={() => removeImage(index)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove photo ${index + 1}`}
                 >
-                  <Trash2 size={16} color="#FBF3F2" />
+                  <Trash2 size={16} color={colors.text} />
                 </TouchableOpacity>
               </View>
             ))}
             {images.length < 5 && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.addImageButton}
                 onPress={pickImage}
+                accessibilityRole="button"
+                accessibilityLabel="Add photo"
               >
-                <Camera size={24} color="#1C768F" />
+                <Camera size={24} color={colors.surface} />
                 <Text style={styles.addImageText}>Add Photo</Text>
               </TouchableOpacity>
             )}
@@ -520,7 +541,7 @@ export default function EditBookScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -529,28 +550,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   saveButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -564,21 +585,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 12,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 12,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     marginBottom: 12,
     paddingHorizontal: 16,
@@ -589,8 +610,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   textAreaContainer: {
     alignItems: 'flex-start',
@@ -606,22 +627,22 @@ const styles = StyleSheet.create({
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
   },
   categoryButtonActive: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   },
   categoryButtonText: {
-    color: '#1C768F',
-    fontSize: 14,
+    color: colors.surface,
+    fontSize: fontSizes[14],
     marginLeft: 6,
   },
   categoryButtonTextActive: {
-    color: '#FBF3F2',
+    color: colors.text,
   },
   optionsContainer: {
     marginBottom: 12,
@@ -629,22 +650,22 @@ const styles = StyleSheet.create({
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
   },
   optionButtonActive: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   },
   optionButtonText: {
-    color: '#1C768F',
-    fontSize: 14,
+    color: colors.surface,
+    fontSize: fontSizes[14],
     marginLeft: 6,
   },
   optionButtonTextActive: {
-    color: '#FBF3F2',
+    color: colors.text,
   },
   imageGrid: {
     flexDirection: 'row',
@@ -665,7 +686,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.danger,
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -675,54 +696,54 @@ const styles = StyleSheet.create({
   addImageButton: {
     width: 100,
     height: 100,
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   addImageText: {
-    color: '#1C768F',
-    fontSize: 14,
+    color: colors.surface,
+    fontSize: fontSizes[14],
     marginTop: 8,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: 18,
-    color: '#FA991C',
+    fontSize: fontSizes[18],
+    color: colors.primary,
     marginBottom: 20,
     textAlign: 'center',
   },
   backButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   errorAlert: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 8,
   },
   errorAlertText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
 });

@@ -10,14 +10,14 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { LogIn, UserPlus, WifiOff, Settings, Share2, RefreshCw } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { useRetry } from '@/src/presentation/hooks/useRetry';
 import ShareModal from '@/src/presentation/components/ShareModal';
-import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 const windowWidth = Dimensions.get('window').width;
 const GRID_SPACING = 12;
@@ -28,16 +28,23 @@ const ITEM_WIDTH = (windowWidth - (40 + GRID_SPACING * (GRID_COLUMNS - 1))) / GR
 const MemoizedImage = memo(Image);
 
 const StatItem = memo(({ value, label, onPress }: { value: number; label: string; onPress?: () => void }) => (
-  <TouchableOpacity style={styles.statItem} onPress={onPress}>
+  <TouchableOpacity
+    style={styles.statItem}
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel={`${value} ${label}`}
+  >
     <Text style={styles.statValue}>{value}</Text>
     <Text style={styles.statLabel}>{label}</Text>
   </TouchableOpacity>
 ));
 
 const BookCard = memo(({ book, onPress }: { book: Book; onPress: () => void }) => (
-  <TouchableOpacity 
+  <TouchableOpacity
     style={styles.bookCard}
     onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel={`Open ${book.title}`}
   >
     <MemoizedImage
       source={{ uri: book.images[0] }}
@@ -260,15 +267,18 @@ export default function ProfileScreen() {
 
   const ErrorDisplay = memo(() => (
     <View style={[styles.errorContainer, error?.isNetwork && styles.networkErrorContainer]}>
-      {error?.isNetwork && <WifiOff size={24} color="#032539" style={styles.errorIcon} />}
+      {error?.isNetwork && <WifiOff size={24} color={colors.background} style={styles.errorIcon} />}
       <Text style={styles.errorText}>{error?.message}</Text>
-      <TouchableOpacity 
-        style={styles.retryButton} 
+      <TouchableOpacity
+        style={styles.retryButton}
         onPress={handleRetry}
         disabled={isRetrying}
+        accessibilityRole="button"
+        accessibilityLabel={isRetrying ? 'Retrying' : 'Try again'}
+        accessibilityState={{ disabled: isRetrying }}
       >
         <View style={styles.retryButtonContent}>
-          <RefreshCw size={16} color="#FBF3F2" style={isRetrying ? styles.spinningIcon : undefined} />
+          <RefreshCw size={16} color={colors.text} style={isRetrying ? styles.spinningIcon : undefined} />
           <Text style={styles.retryButtonText}>
             {isRetrying ? 'Retrying...' : 'Try Again'}
           </Text>
@@ -280,7 +290,7 @@ export default function ProfileScreen() {
   if (loading && !error) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
@@ -341,33 +351,41 @@ export default function ProfileScreen() {
 
         {isGuest ? (
           <View style={styles.authButtons}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.button, styles.followButton]}
               onPress={() => router.push('/login')}
+              accessibilityRole="button"
+              accessibilityLabel="Sign in"
             >
-              <LogIn size={20} color="#FFF" />
+              <LogIn size={20} color={colors.onDark} />
               <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.button, styles.messageButton]}
               onPress={() => router.push('/signup')}
+              accessibilityRole="button"
+              accessibilityLabel="Register"
             >
-              <UserPlus size={20} color="#FFF" />
+              <UserPlus size={20} color={colors.onDark} />
               <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.actionButtons}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.button, styles.followButton]}
               onPress={() => router.push('/edit-profile')}
+              accessibilityRole="button"
+              accessibilityLabel="Edit profile"
             >
               <Text style={styles.buttonText}>Edit Profile</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.button, styles.messageButton]}
               onPress={() => setShowShareModal(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Share profile"
             >
               <Text style={styles.buttonText}>Share Profile</Text>
             </TouchableOpacity>
@@ -378,7 +396,11 @@ export default function ProfileScreen() {
       <View style={styles.booksSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Uploaded Books</Text>
-          <TouchableOpacity onPress={() => router.push('/library')}>
+          <TouchableOpacity
+            onPress={() => router.push('/library')}
+            accessibilityRole="button"
+            accessibilityLabel="View all uploaded books"
+          >
             <Text style={styles.viewAllButton}>View all</Text>
           </TouchableOpacity>
         </View>
@@ -406,7 +428,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     padding: 20,
@@ -428,15 +450,15 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 40,
     borderWidth: 3,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   emptyProfileImage: {
     width: '100%',
     height: '100%',
     borderRadius: 40,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderWidth: 3,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   statsContainer: {
     flex: 1,
@@ -447,27 +469,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.8,
   },
   bioSection: {
     marginBottom: 24,
   },
   name: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
   },
   bio: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
   },
   actionButtons: {
@@ -489,19 +511,19 @@ const styles = StyleSheet.create({
   },
   followButton: {
     flex: 1,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
   },
   editButton: {
     flex: 1,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   },
   messageButton: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     paddingHorizontal: 16,
   },
   buttonText: {
-    color: '#FFF',
-    fontSize: 16,
+    color: colors.onDark,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   booksSection: {
@@ -514,13 +536,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   viewAllButton: {
-    color: '#FA991C',
-    fontSize: 14,
+    color: colors.primary,
+    fontSize: fontSizes[14],
     fontWeight: '500',
   },
   booksGrid: {
@@ -531,69 +553,69 @@ const styles = StyleSheet.create({
   bookCard: {
     width: ITEM_WIDTH,
     margin: ITEM_MARGIN,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     overflow: 'hidden',
   },
   bookImage: {
     width: '100%',
     aspectRatio: 3/4,
-    backgroundColor: '#0D1B2A',
+    backgroundColor: colors.badgeBackground,
   },
   bookInfo: {
     padding: 12,
   },
   bookTitle: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 4,
   },
   bookPrice: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '600',
-    color: '#FA991C',
+    color: colors.primary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     alignItems: 'center',
   },
   networkErrorContainer: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: colors.warningBackground,
     borderWidth: 1,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   errorIcon: {
     marginBottom: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
     marginBottom: 12,
   },
   retryButton: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -604,8 +626,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   retryButtonText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
     fontWeight: '600',
   },
   spinningIcon: {

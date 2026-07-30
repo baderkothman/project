@@ -14,6 +14,7 @@ import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, LogIn } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -72,12 +73,12 @@ export default function LoginScreen() {
           )}
 
           <View style={styles.inputContainer}>
-            <Mail size={20} color="#1C768F" style={styles.inputIcon} />
+            <Mail size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="Email address"
               style={styles.input}
               placeholder="Email"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -87,12 +88,12 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Lock size={20} color="#1C768F" style={styles.inputIcon} />
+            <Lock size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               accessibilityLabel="Password"
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -106,7 +107,7 @@ export default function LoginScreen() {
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}>
-            <LogIn size={20} color="#FBF3F2" />
+            <LogIn size={20} color={colors.text} />
             <Text style={styles.buttonText}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Text>
@@ -114,7 +115,7 @@ export default function LoginScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account?</Text>
-            <TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Sign up">
               <Link href="/(auth)/signup">
                   <Text style={styles.footerLink}> Sign Up</Text>
               </Link>
@@ -129,7 +130,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -140,43 +141,43 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   headerImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(3, 37, 57, 0.7)',
   },
   title: {
-    fontSize: 32,
+    fontSize: fontSizes[32],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#FBF3F2',
+    fontSize: fontSizes[18],
+    color: colors.text,
     opacity: 0.9,
   },
   form: {
     padding: 20,
   },
   errorContainer: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     marginBottom: 16,
     paddingHorizontal: 16,
@@ -187,14 +188,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     marginTop: 8,
@@ -203,8 +204,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -215,12 +216,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   footerLink: {
-    color: '#FA991C',
-    fontSize: 14,
+    color: colors.primary,
+    fontSize: fontSizes[14],
     fontWeight: '600',
     marginLeft: 4,
   },

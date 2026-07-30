@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, 
 import { Link, useRouter } from 'expo-router';
 import { ArrowLeft, BookOpen, Users, Sparkles, Heart } from 'lucide-react-native';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface TeamMember {
   name: string;
@@ -50,8 +51,10 @@ export default function AboutScreen() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>About Us</Text>
         <View style={styles.placeholder} />
@@ -68,7 +71,7 @@ export default function AboutScreen() {
           />
           <View style={styles.heroOverlay} />
           <View style={styles.heroContent}>
-            <BookOpen size={48} color="#FA991C" />
+            <BookOpen size={48} color={colors.primary} />
             <Text style={styles.heroTitle}>Connecting Readers Worldwide</Text>
             <Text style={styles.heroSubtitle}>Share stories, discover books, build community</Text>
           </View>
@@ -76,7 +79,7 @@ export default function AboutScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Heart size={24} color="#FA991C" />
+            <Heart size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Our Mission</Text>
           </View>
           <Text style={styles.sectionText}>
@@ -89,7 +92,7 @@ export default function AboutScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <BookOpen size={24} color="#FA991C" />
+            <BookOpen size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>What We Offer</Text>
           </View>
           <View style={styles.features}>
@@ -122,7 +125,7 @@ export default function AboutScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Sparkles size={24} color="#FA991C" />
+            <Sparkles size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Our Vision</Text>
           </View>
           <Text style={styles.sectionText}>
@@ -135,7 +138,7 @@ export default function AboutScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Users size={24} color="#FA991C" />
+            <Users size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Meet the Team</Text>
           </View>
           <View style={styles.teamGrid}>
@@ -159,7 +162,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -168,22 +171,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -200,33 +203,33 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   heroOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(3, 37, 57, 0.7)',
   },
   heroContent: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   heroTitle: {
-    fontSize: 32,
+    fontSize: fontSizes[32],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 8,
   },
   heroSubtitle: {
-    fontSize: 18,
-    color: '#FBF3F2',
+    fontSize: fontSizes[18],
+    color: colors.text,
     textAlign: 'center',
     opacity: 0.9,
   },
   section: {
     padding: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -235,14 +238,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   sectionText: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     lineHeight: 24,
-    color: '#FBF3F2',
+    color: colors.text,
     opacity: 0.9,
     marginBottom: 16,
   },
@@ -250,20 +253,20 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   featureCard: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 20,
   },
   featureTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FA991C',
+    color: colors.primary,
     marginBottom: 8,
   },
   featureText: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     lineHeight: 20,
-    color: '#FBF3F2',
+    color: colors.text,
     opacity: 0.9,
   },
   teamGrid: {
@@ -274,7 +277,7 @@ const styles = StyleSheet.create({
   },
   teamCard: {
     width: '47%',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -285,18 +288,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 12,
     borderWidth: 3,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   teamMemberName: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
     textAlign: 'center',
   },
   teamMemberRole: {
-    fontSize: 14,
-    color: '#FA991C',
+    fontSize: fontSizes[14],
+    color: colors.primary,
     textAlign: 'center',
   },
 });

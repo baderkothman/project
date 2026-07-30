@@ -15,6 +15,7 @@ import { ArrowLeft, UserPlus, UserMinus } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface User {
   id: string;
@@ -113,9 +114,11 @@ export default function UsersScreen() {
 
   const renderUser = ({ item }: { item: User }) => (
     <View style={styles.userCard}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.userContent}
         onPress={() => router.push(`/profile/${item.id}`)}
+        accessibilityRole="button"
+        accessibilityLabel={`View ${item.first_name} ${item.last_name}'s profile`}
       >
         <Image
           source={{ 
@@ -137,11 +140,14 @@ export default function UsersScreen() {
           followingMap[item.id] && styles.followingButton
         ]}
         onPress={() => toggleFollow(item.id)}
+        accessibilityRole="button"
+        accessibilityLabel={followingMap[item.id] ? `Unfollow ${item.first_name} ${item.last_name}` : `Follow ${item.first_name} ${item.last_name}`}
+        accessibilityState={{ selected: followingMap[item.id] }}
       >
         {followingMap[item.id] ? (
-          <UserMinus size={20} color="#FBF3F2" />
+          <UserMinus size={20} color={colors.text} />
         ) : (
-          <UserPlus size={20} color="#FBF3F2" />
+          <UserPlus size={20} color={colors.text} />
         )}
       </TouchableOpacity>
     </View>
@@ -156,11 +162,13 @@ export default function UsersScreen() {
       />
 
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Search Results</Text>
         <View style={styles.placeholder} />
@@ -174,7 +182,7 @@ export default function UsersScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FA991C" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Searching users...</Text>
         </View>
       ) : (
@@ -199,7 +207,7 @@ export default function UsersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -212,22 +220,22 @@ const styles = StyleSheet.create({
       default: 20
     }),
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -238,7 +246,7 @@ const styles = StyleSheet.create({
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     padding: 12,
     borderRadius: 12,
     marginBottom: 8,
@@ -254,34 +262,34 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   userInfo: {
     flex: 1,
   },
   name: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 2,
   },
   username: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.7,
   },
   followButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   followingButton: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -290,18 +298,18 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     margin: 16,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   emptyContainer: {
@@ -309,8 +317,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     textAlign: 'center',
   }
 });

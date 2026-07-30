@@ -13,7 +13,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, useFocusEffect } from 'expo-router';
 import {
   Search,
   BookOpen,
@@ -33,8 +33,8 @@ import {
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { searchGoogleBooks } from '@/src/application/services/google-books';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
-import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface Book {
   id: string;
@@ -394,7 +394,7 @@ export default function BrowseScreen() {
     if (loadingHistory) {
       return (
         <View style={styles.historyLoading}>
-          <ActivityIndicator size="small" color="#FA991C" />
+          <ActivityIndicator size="small" color={colors.primary} />
           <Text style={styles.historyLoadingText}>Loading search history...</Text>
         </View>
       );
@@ -407,7 +407,7 @@ export default function BrowseScreen() {
     if (searchHistory.length === 0) {
       return (
         <View style={styles.emptyHistory}>
-          <History size={24} color="#1C768F" />
+          <History size={24} color={colors.surface} />
           <Text style={styles.emptyHistoryText}>You haven't searched for anything yet</Text>
         </View>
       );
@@ -427,14 +427,18 @@ export default function BrowseScreen() {
                 setQuery(term);
                 searchBooks(term);
               }}
+              accessibilityRole="button"
+              accessibilityLabel={`Search for ${term}`}
             >
-              <History size={16} color="#1C768F" />
+              <History size={16} color={colors.surface} />
               <Text style={styles.historyText}>{term}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             style={styles.clearHistoryButton}
             onPress={clearSearchHistory}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search history"
           >
             <Text style={styles.clearHistoryButtonText}>Clear History</Text>
           </TouchableOpacity>
@@ -443,11 +447,13 @@ export default function BrowseScreen() {
           <TouchableOpacity
             style={styles.viewAllButton}
             onPress={() => setShowAllHistory(!showAllHistory)}
+            accessibilityRole="button"
+            accessibilityLabel={showAllHistory ? 'Show fewer recent searches' : 'View all recent searches'}
           >
             <Text style={styles.viewAllText}>
               {showAllHistory ? 'Show Less' : 'View All'}
             </Text>
-            <ChevronRight size={16} color="#FA991C" />
+            <ChevronRight size={16} color={colors.primary} />
           </TouchableOpacity>
         )}
       </View>
@@ -459,6 +465,8 @@ export default function BrowseScreen() {
       <TouchableOpacity
         style={styles.bookContent}
         onPress={() => router.push(`/google-book/${item.id}`)}
+        accessibilityRole="button"
+        accessibilityLabel={`Open ${item.volumeInfo.title}`}
       >
         <Image
           source={{
@@ -478,12 +486,12 @@ export default function BrowseScreen() {
           )}
           <View style={styles.bookMeta}>
             <View style={styles.ratingContainer}>
-              <Star size={16} color="#FA991C" fill="#FA991C" />
+              <Star size={16} color={colors.primary} fill={colors.primary} />
               <Text style={styles.ratingText}>
                 {item.volumeInfo.averageRating?.toFixed(1) || '4.5'}
               </Text>
             </View>
-            <Download size={16} color="#FA991C" />
+            <Download size={16} color={colors.primary} />
           </View>
         </View>
       </TouchableOpacity>
@@ -492,17 +500,21 @@ export default function BrowseScreen() {
           <TouchableOpacity
             style={styles.previewButton}
             onPress={() => handlePreview(item.volumeInfo.previewLink!)}
+            accessibilityRole="button"
+            accessibilityLabel="Preview in app"
           >
             <View style={styles.previewContent}>
-              <ExternalLink size={16} color="#FBF3F2" />
+              <ExternalLink size={16} color={colors.text} />
               <Text style={styles.previewButtonText}>Preview In-App</Text>
             </View>
-            <TouchableOpacity
-              style={styles.wishlistButton}
-              onPress={() => addToWishlist(item)}
-            >
-              <Heart size={16} color="#FA991C" />
-            </TouchableOpacity>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.wishlistButton}
+            onPress={() => addToWishlist(item)}
+            accessibilityRole="button"
+            accessibilityLabel={`Add ${item.volumeInfo.title} to wishlist`}
+          >
+            <Heart size={16} color={colors.primary} />
           </TouchableOpacity>
         </View>
       )}
@@ -517,15 +529,19 @@ export default function BrowseScreen() {
           <TouchableOpacity
             style={styles.clearButton}
             onPress={clearFilters}
+            accessibilityRole="button"
+            accessibilityLabel="Reset filters"
           >
-            <ArrowUpDown size={16} color="#FBF3F2" />
+            <ArrowUpDown size={16} color={colors.text} />
             <Text style={styles.clearButtonText}>Reset</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setShowFilters(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Close filters"
           >
-            <X size={20} color="#FBF3F2" />
+            <X size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
       </View>
@@ -542,6 +558,9 @@ export default function BrowseScreen() {
                   sortBy === option.id && styles.sortOptionActive
                 ]}
                 onPress={() => setSortBy(option.id)}
+                accessibilityRole="radio"
+                accessibilityLabel={`Sort by ${option.name}`}
+                accessibilityState={{ checked: sortBy === option.id }}
               >
                 <Text style={[
                   styles.sortOptionText,
@@ -565,6 +584,9 @@ export default function BrowseScreen() {
                   selectedPreviewType.includes(option.id) && styles.filterOptionActive
                 ]}
                 onPress={() => togglePreviewType(option.id)}
+                accessibilityRole="checkbox"
+                accessibilityLabel={option.name}
+                accessibilityState={{ checked: selectedPreviewType.includes(option.id) }}
               >
                 <Text style={[
                   styles.filterOptionText,
@@ -588,6 +610,9 @@ export default function BrowseScreen() {
                   selectedLanguages.includes(lang.code) && styles.filterOptionActive
                 ]}
                 onPress={() => toggleLanguage(lang.code)}
+                accessibilityRole="checkbox"
+                accessibilityLabel={lang.name}
+                accessibilityState={{ checked: selectedLanguages.includes(lang.code) }}
               >
                 <Text style={[
                   styles.filterOptionText,
@@ -611,6 +636,9 @@ export default function BrowseScreen() {
                   selectedGenres.includes(genre) && styles.filterOptionActive
                 ]}
                 onPress={() => toggleGenre(genre)}
+                accessibilityRole="checkbox"
+                accessibilityLabel={genre}
+                accessibilityState={{ checked: selectedGenres.includes(genre) }}
               >
                 <Text style={[
                   styles.filterOptionText,
@@ -630,6 +658,8 @@ export default function BrowseScreen() {
           setShowFilters(false);
           searchBooks();
         }}
+        accessibilityRole="button"
+        accessibilityLabel="Apply filters"
       >
         <Text style={styles.applyButtonText}>Apply Filters</Text>
       </TouchableOpacity>
@@ -640,11 +670,11 @@ export default function BrowseScreen() {
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color="#1C768F" style={styles.searchIcon} />
+          <Search size={20} color={colors.surface} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search books..."
-            placeholderTextColor="#1C768F"
+            placeholderTextColor={colors.surface}
             value={query}
             onChangeText={handleQueryChange}
             onSubmitEditing={() => searchBooks()}
@@ -658,8 +688,10 @@ export default function BrowseScreen() {
                 setBooks([]);
               }}
               style={styles.clearButton}
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
             >
-              <X size={20} color="#1C768F" />
+              <X size={20} color={colors.surface} />
             </TouchableOpacity>
           )}
         </View>
@@ -668,17 +700,22 @@ export default function BrowseScreen() {
           <TouchableOpacity
             style={[styles.filterButton, showFilters && styles.filterButtonActive]}
             onPress={() => setShowFilters(!showFilters)}
+            accessibilityRole="button"
+            accessibilityLabel="Toggle filters"
+            accessibilityState={{ expanded: showFilters }}
           >
-            <SlidersHorizontal size={20} color="#FBF3F2" />
+            <SlidersHorizontal size={20} color={colors.text} />
             <Text style={styles.filterButtonText}>Filters</Text>
-            <ChevronDown size={16} color="#FBF3F2" />
+            <ChevronDown size={16} color={colors.text} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.searchButton}
             onPress={() => searchBooks()}
+            accessibilityRole="button"
+            accessibilityLabel="Search"
           >
-            <BookOpen size={20} color="#FBF3F2" />
+            <BookOpen size={20} color={colors.text} />
             <Text style={styles.searchButtonText}>Search</Text>
           </TouchableOpacity>
         </View>
@@ -689,7 +726,12 @@ export default function BrowseScreen() {
       {error && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => searchBooks()}>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => searchBooks()}
+            accessibilityRole="button"
+            accessibilityLabel="Retry search"
+          >
             <Text style={styles.retryButtonText}>Retry Search</Text>
           </TouchableOpacity>
         </View>
@@ -697,7 +739,7 @@ export default function BrowseScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FA991C" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Searching books...</Text>
         </View>
       ) : showSearchResults && books.length > 0 ? (
@@ -737,19 +779,19 @@ export default function BrowseScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   searchContainer: {
     padding: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     paddingHorizontal: 16,
     marginBottom: 16,
@@ -760,8 +802,8 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#032539',
+    fontSize: fontSizes[16],
+    color: colors.background,
   },
   searchActions: {
     flexDirection: 'row',
@@ -772,13 +814,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     height: 46,
   },
   searchButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -787,23 +829,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     height: 46,
     gap: 4,
   },
   filterButtonActive: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
   },
   filterButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   filtersContainer: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#FA991C',
+    borderBottomColor: colors.primary,
     maxHeight: 500,
   },
   filtersHidden: {
@@ -815,7 +857,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#FA991C',
+    borderBottomColor: colors.primary,
   },
   filterHeaderActions: {
     flexDirection: 'row',
@@ -823,9 +865,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   filterTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   clearButton: {
     flexDirection: 'row',
@@ -834,8 +876,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   clearButtonText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   closeButton: {
     padding: 4,
@@ -847,9 +889,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   filterSectionTitle: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 12,
   },
   filterOptions: {
@@ -861,19 +903,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   filterOptionActive: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
   },
   filterOptionText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   filterOptionTextActive: {
-    color: '#032539',
+    color: colors.background,
   },
   sortOptions: {
     gap: 8,
@@ -882,36 +924,36 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
     marginBottom: 8,
   },
   sortOptionActive: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
   },
   sortOptionText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   sortOptionTextActive: {
-    color: '#032539',
+    color: colors.background,
   },
   applyButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 20,
     alignItems: 'center',
   },
   applyButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   booksList: {
     padding: 20,
   },
   bookCard: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 16,
     elevation: 2,
@@ -934,14 +976,14 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   bookTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 12,
   },
@@ -957,18 +999,22 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ratingText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
     fontWeight: '500',
   },
   previewContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#FA991C',
-  },
-  previewButton: {
+    borderTopColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingRight: 12,
+  },
+  previewButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 12,
   },
   previewContent: {
@@ -977,15 +1023,15 @@ const styles = StyleSheet.create({
   },
   previewButtonText: {
     marginLeft: 8,
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     fontWeight: '500',
   },
   wishlistButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -996,29 +1042,29 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 8,
     alignItems: 'center',
   },
   errorText: {
-    color: '#FBF3F2',
+    color: colors.text,
     textAlign: 'center',
     marginBottom: 12,
   },
   retryButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FBF3F2',
+    color: colors.text,
     fontWeight: '600',
   },
   emptyContainer: {
@@ -1034,14 +1080,14 @@ const styles = StyleSheet.create({
   },
   historyContainer: {
     padding: 16,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 24,
   },
   historyTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 12,
   },
   historyList: {
@@ -1050,15 +1096,15 @@ const styles = StyleSheet.create({
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     padding: 12,
     borderRadius: 8,
     gap: 8,
   },
   historyText: {
     flex: 1,
-    fontSize: 14,
-    color: '#032539',
+    fontSize: fontSizes[14],
+    color: colors.background,
   },
   viewAllButton: {
     flexDirection: 'row',
@@ -1068,21 +1114,21 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   viewAllText: {
-    color: '#FA991C',
-    fontSize: 14,
+    color: colors.primary,
+    fontSize: fontSizes[14],
     fontWeight: '500',
     marginRight: 4,
   },
   emptyHistory: {
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 24,
   },
   emptyHistoryText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     marginTop: 12,
     textAlign: 'center',
   },
@@ -1091,33 +1137,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: 24,
     gap: 8,
   },
   historyLoadingText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   emptyText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     textAlign: 'center',
   },
   clearHistoryButton: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 10,
     borderRadius: 6,
     marginTop: 12,
     alignItems: 'center',
   },
   clearHistoryButtonText: {
-    color: '#FBF3F2',
+    color: colors.text,
     fontWeight: 'bold',
   },
   noHistory: {
-    color: '#FBF3F2',
+    color: colors.text,
     textAlign: 'center',
     marginTop: 16,
   },

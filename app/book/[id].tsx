@@ -16,6 +16,7 @@ import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
 import { Modal, TextInput, FlatList } from 'react-native';
 import { Send } from 'lucide-react-native';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 
 interface Book {
@@ -164,6 +165,8 @@ export default function BookDetails() {
       ]}
       onPress={() => handleShare(item.id)}
       disabled={sharingWith === item.id}
+      accessibilityRole="button"
+      accessibilityLabel={`Share with ${item.first_name} ${item.last_name}`}
     >
       <Image
         source={{
@@ -179,9 +182,9 @@ export default function BookDetails() {
         <Text style={styles.followerUsername}>@{item.username}</Text>
       </View>
       {sharingWith === item.id ? (
-        <ActivityIndicator color="#FA991C" />
+        <ActivityIndicator color={colors.primary} />
       ) : (
-        <Send size={20} color="#FA991C" />
+        <Send size={20} color={colors.primary} />
       )}
     </TouchableOpacity>
   );
@@ -194,7 +197,7 @@ export default function BookDetails() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading book details...</Text>
       </View>
     );
@@ -204,7 +207,7 @@ export default function BookDetails() {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Book not found</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Go back">
           <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
@@ -216,8 +219,8 @@ export default function BookDetails() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <ArrowLeft size={24} color="#FBF3F2" />
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Go back">
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
@@ -229,8 +232,10 @@ export default function BookDetails() {
             setShowShareModal(true);
             fetchFollowers();
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Share this book"
         >
-          <Share2 size={24} color="#FBF3F2" />
+          <Share2 size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -306,8 +311,10 @@ export default function BookDetails() {
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setShowShareModal(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Close share dialog"
               >
-                <ArrowLeft size={24} color="#FBF3F2" />
+                <ArrowLeft size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -315,7 +322,7 @@ export default function BookDetails() {
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search friends..."
-                placeholderTextColor="#1C768F"
+                placeholderTextColor={colors.surface}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
@@ -323,7 +330,7 @@ export default function BookDetails() {
 
             {loadingFollowers ? (
               <View style={styles.loadingFollowers}>
-                <ActivityIndicator color="#FA991C" />
+                <ActivityIndicator color={colors.primary} />
                 <Text style={styles.loadingFollowersText}>
                   Loading friends...
                 </Text>
@@ -363,7 +370,7 @@ export default function BookDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -372,7 +379,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingBottom: 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   headerActions: {
     flexDirection: 'row',
@@ -382,7 +389,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -396,14 +403,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   imageContainer: {
     width: '100%',
     height: 500,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   },
   coverImage: {
     width: '100%',
@@ -411,21 +418,21 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -30,
     padding: 24,
   },
   title: {
-    fontSize: 28,
+    fontSize: fontSizes[28],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 8,
   },
   author: {
-    fontSize: 18,
-    color: '#FBF3F2',
+    fontSize: fontSizes[18],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 16,
   },
@@ -433,21 +440,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 12,
   },
   description: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     lineHeight: 24,
-    color: '#FBF3F2',
+    color: colors.text,
     opacity: 0.8,
   },
   detailsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
@@ -459,14 +466,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   detailLabel: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.7,
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     fontWeight: '600',
   },
   categories: {
@@ -475,23 +482,23 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryBadge: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   categoryText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: '#1C768F',
+    borderTopColor: colors.surface,
     gap: 12,
   },
   previewButton: {
@@ -499,7 +506,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     height: 56,
     borderRadius: 28,
     gap: 8,
@@ -509,43 +516,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     height: 56,
     borderRadius: 28,
     gap: 8,
   },
   buttonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: 16,
-    color: '#FA991C',
+    fontSize: fontSizes[16],
+    color: colors.primary,
     marginBottom: 20,
     textAlign: 'center',
   },
   backButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   modalOverlay: {
@@ -554,7 +561,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -568,23 +575,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   closeButton: {
     padding: 4,
   },
   searchContainer: {
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     paddingHorizontal: 16,
     marginBottom: 16,
   },
   searchInput: {
     height: 50,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   followersList: {
     maxHeight: 400,
@@ -595,7 +602,7 @@ const styles = StyleSheet.create({
   followerItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     padding: 12,
     borderRadius: 12,
     marginBottom: 8,
@@ -609,20 +616,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   followerInfo: {
     flex: 1,
   },
   followerName: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 2,
   },
   followerUsername: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.7,
   },
   loadingFollowers: {
@@ -630,17 +637,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingFollowersText: {
-    color: '#FBF3F2',
+    color: colors.text,
     marginTop: 8,
-    fontSize: 14,
+    fontSize: fontSizes[14],
   },
   emptyFollowers: {
     padding: 20,
     alignItems: 'center',
   },
   emptyFollowersText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     textAlign: 'center',
   },
   toast: {
@@ -648,22 +655,22 @@ const styles = StyleSheet.create({
     bottom: Platform.OS === 'ios' ? 100 : 80,
     left: 20,
     right: 20,
-    backgroundColor: '#228B22',
+    backgroundColor: colors.available,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   toastError: {
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.danger,
   },
   toastText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '500',
   },
   location: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
   },
   priceContainer: {
@@ -673,24 +680,24 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   price: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
   },
   conditionBadge: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   conditionText: {
-    color: '#FBF3F2',
-    fontSize: 14,
+    color: colors.text,
+    fontSize: fontSizes[14],
     fontWeight: '500',
   },
   uploaderName: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
   },
 });

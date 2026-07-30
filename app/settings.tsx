@@ -6,25 +6,29 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { 
-  Lock, 
-  CircleHelp as HelpCircle, 
-  Info, 
+import {
+  Lock,
+  CircleHelp as HelpCircle,
+  Info,
   LogOut,
   CreditCard,
   ArrowLeft,
   ChevronRight,
+  Trash2,
 } from 'lucide-react-native';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { isGuest } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleLogout = async () => {
@@ -39,6 +43,38 @@ export default function SettingsScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      setDeleting(true);
+      setError(null);
+      const { error: deleteError } = await dataClient.auth.deleteAccount();
+      if (deleteError) throw deleteError;
+      router.replace('/(tabs)');
+    } catch (err) {
+      console.error('Error deleting account:', err);
+      setError('Failed to delete account');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    if (Platform.OS === 'web') {
+      if (window.confirm('Delete your account? This permanently removes your profile, books, and messages. This cannot be undone.')) {
+        void deleteAccount();
+      }
+      return;
+    }
+    Alert.alert(
+      'Delete Account',
+      'This permanently removes your profile, books, and messages. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => void deleteAccount() },
+      ],
+    );
   };
 
   const sections = [
@@ -97,7 +133,7 @@ export default function SettingsScreen() {
         accessibilityState={{ disabled: Boolean(item.disabled) }}
       >
         <View style={styles.itemLeft}>
-          <Icon size={24} color={item.disabled ? '#666' : '#FA991C'} />
+          <Icon size={24} color={item.disabled ? colors.disabled : colors.primary} />
           <Text style={[
             styles.itemLabel,
             item.disabled && styles.itemLabelDisabled
@@ -107,7 +143,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.itemRight}>
-          <ChevronRight size={20} color="#666" />
+          <ChevronRight size={20} color={colors.disabled} />
         </View>
       </TouchableOpacity>
     );
@@ -121,7 +157,7 @@ export default function SettingsScreen() {
           accessibilityLabel="Go back"
           style={styles.backButton}
           onPress={() => router.back()}>
-          <ArrowLeft size={24} color="#FBF3F2" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
         <View style={styles.placeholder} />
@@ -151,9 +187,24 @@ export default function SettingsScreen() {
             onPress={handleLogout}
             disabled={loading}
           >
-            <LogOut size={24} color="#FBF3F2" />
+            <LogOut size={24} color={colors.text} />
             <Text style={styles.logoutText}>
               {loading ? 'Signing out...' : 'Sign Out'}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {!isGuest && (
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Delete account"
+            style={[styles.deleteButton, deleting && styles.logoutButtonDisabled]}
+            onPress={handleDeleteAccount}
+            disabled={deleting}
+          >
+            <Trash2 size={24} color={colors.danger} />
+            <Text style={styles.deleteText}>
+              {deleting ? 'Deleting account...' : 'Delete Account'}
             </Text>
           </TouchableOpacity>
         )}
@@ -165,7 +216,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -174,22 +225,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     paddingBottom: 16,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C768F',
+    borderBottomColor: colors.surface,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -201,14 +252,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: '600',
-    color: '#FA991C',
+    color: colors.primary,
     marginBottom: 16,
     textTransform: 'uppercase',
   },
   sectionContent: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -218,7 +269,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#032539',
+    borderBottomColor: colors.background,
   },
   itemDisabled: {
     opacity: 0.5,
@@ -228,20 +279,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemLabel: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     marginLeft: 12,
   },
   itemLabelDisabled: {
-    color: '#666',
+    color: colors.disabled,
   },
   itemRight: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   itemValue: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.8,
     marginRight: 8,
   },
@@ -249,30 +300,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#DC2626',
-    margin: 20,
+    backgroundColor: colors.danger,
+    marginHorizontal: 20,
+    marginTop: 20,
     padding: 16,
     borderRadius: 12,
-    marginBottom: Platform.OS === 'ios' ? 34 : 20,
   },
   logoutButtonDisabled: {
     opacity: 0.7,
   },
   logoutText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.danger,
+    marginHorizontal: 20,
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: Platform.OS === 'ios' ? 34 : 20,
+  },
+  deleteText: {
+    color: colors.danger,
+    fontSize: fontSizes[16],
     fontWeight: '600',
     marginLeft: 8,
   },
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
 });

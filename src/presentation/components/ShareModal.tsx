@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Copy, X } from 'lucide-react-native';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 interface ShareModalProps {
   visible: boolean;
@@ -90,6 +91,8 @@ export default function ShareModal({ visible, onClose, url }: ShareModalProps) {
           style={styles.overlayTouch}
           onPress={onClose}
           activeOpacity={1}
+          accessibilityRole="button"
+          accessibilityLabel="Close share dialog"
         >
           <Animated.View 
             style={[
@@ -104,8 +107,10 @@ export default function ShareModal({ visible, onClose, url }: ShareModalProps) {
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel="Close"
               >
-                <X size={24} color="#FBF3F2" />
+                <X size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -116,8 +121,10 @@ export default function ShareModal({ visible, onClose, url }: ShareModalProps) {
               <TouchableOpacity
                 style={styles.copyButton}
                 onPress={handleCopyLink}
+                accessibilityRole="button"
+                accessibilityLabel="Copy link"
               >
-                <Copy size={20} color="#FBF3F2" />
+                <Copy size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -148,7 +155,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -162,9 +169,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   closeButton: {
     padding: 4,
@@ -172,34 +179,34 @@ const styles = StyleSheet.create({
   urlContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
   url: {
     flex: 1,
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     marginRight: 12,
   },
   copyButton: {
     padding: 8,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 8,
   },
   shareButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     gap: 8,
   },
   shareButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   toast: {
@@ -207,14 +214,14 @@ const styles = StyleSheet.create({
     bottom: Platform.OS === 'ios' ? 100 : 80,
     left: 20,
     right: 20,
-    backgroundColor: '#228B22',
+    backgroundColor: colors.available,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   toastText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '500',
   },
 });

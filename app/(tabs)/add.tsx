@@ -29,6 +29,7 @@ import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 const CATEGORIES = [
   'Fiction',
@@ -332,7 +333,7 @@ export default function AddScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <BookPlus size={32} color="#FA991C" />
+        <BookPlus size={32} color={colors.primary} />
         <Text style={styles.title}>List Your Book</Text>
         <Text style={styles.subtitle}>Share your books with other readers</Text>
       </View>
@@ -348,33 +349,33 @@ export default function AddScreen() {
           <Text style={styles.sectionTitle}>Book Details</Text>
 
           <View style={styles.inputContainer}>
-            <LibraryBig size={20} color="#1C768F" style={styles.inputIcon} />
+            <LibraryBig size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Book Title"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.title}
               onChangeText={(text) => setFormData({ ...formData, title: text })}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <User size={20} color="#1C768F" style={styles.inputIcon} />
+            <User size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Author"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.author}
               onChangeText={(text) => setFormData({ ...formData, author: text })}
             />
           </View>
 
           <View style={[styles.inputContainer, styles.textAreaContainer]}>
-            <FileText size={20} color="#1C768F" style={styles.inputIcon} />
+            <FileText size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Description"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.description}
               onChangeText={(text) => setFormData({ ...formData, description: text })}
               multiline
@@ -398,10 +399,13 @@ export default function AddScreen() {
                   selectedCategory === category && styles.categoryButtonActive
                 ]}
                 onPress={() => setSelectedCategory(category)}
+                accessibilityRole="radio"
+                accessibilityLabel={category}
+                accessibilityState={{ checked: selectedCategory === category }}
               >
                 <LayoutGrid
                   size={16}
-                  color={selectedCategory === category ? '#FBF3F2' : '#1C768F'}
+                  color={selectedCategory === category ? colors.text : colors.surface}
                 />
                 <Text
                   style={[
@@ -433,10 +437,13 @@ export default function AddScreen() {
                     selectedLanguage === lang.code && styles.optionButtonActive
                   ]}
                   onPress={() => setSelectedLanguage(lang.code)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={lang.name}
+                  accessibilityState={{ checked: selectedLanguage === lang.code }}
                 >
                   <Languages
                     size={16}
-                    color={selectedLanguage === lang.code ? '#FBF3F2' : '#1C768F'}
+                    color={selectedLanguage === lang.code ? colors.text : colors.surface}
                   />
                   <Text
                     style={[
@@ -463,10 +470,13 @@ export default function AddScreen() {
                     selectedCondition === condition && styles.optionButtonActive
                   ]}
                   onPress={() => setSelectedCondition(condition)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={condition}
+                  accessibilityState={{ checked: selectedCondition === condition }}
                 >
                   <Info
                     size={16}
-                    color={selectedCondition === condition ? '#FBF3F2' : '#1C768F'}
+                    color={selectedCondition === condition ? colors.text : colors.surface}
                   />
                   <Text
                     style={[
@@ -486,11 +496,11 @@ export default function AddScreen() {
           <Text style={styles.sectionTitle}>Additional Information</Text>
 
           <View style={styles.inputContainer}>
-            <DollarSign size={20} color="#1C768F" style={styles.inputIcon} />
+            <DollarSign size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Price"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.price}
               onChangeText={(text) => setFormData({ ...formData, price: text })}
               keyboardType="numeric"
@@ -498,11 +508,11 @@ export default function AddScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <LibraryBig size={20} color="#1C768F" style={styles.inputIcon} />
+            <LibraryBig size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Number of Pages"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.pages}
               onChangeText={(text) => setFormData({ ...formData, pages: text })}
               keyboardType="numeric"
@@ -510,22 +520,22 @@ export default function AddScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Info size={20} color="#1C768F" style={styles.inputIcon} />
+            <Info size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="ISBN (optional)"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.isbn}
               onChangeText={(text) => setFormData({ ...formData, isbn: text })}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Globe2 size={20} color="#1C768F" style={styles.inputIcon} />
+            <Globe2 size={20} color={colors.surface} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Location"
-              placeholderTextColor="#1C768F"
+              placeholderTextColor={colors.surface}
               value={formData.location}
               onChangeText={(text) => setFormData({ ...formData, location: text })}
             />
@@ -543,6 +553,8 @@ export default function AddScreen() {
                 <TouchableOpacity
                   style={styles.removeImageButton}
                   onPress={() => setImages(images.filter((_, i) => i !== index))}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove photo ${index + 1}`}
                 >
                   <Text style={styles.removeImageText}>×</Text>
                 </TouchableOpacity>
@@ -555,7 +567,7 @@ export default function AddScreen() {
                 style={styles.addImageButton}
                 onPress={pickImage}
                 disabled={loading}>
-                <Camera size={24} color="#1C768F" />
+                <Camera size={24} color={colors.surface} />
                 <Text style={styles.addImageText}>Choose photo</Text>
               </TouchableOpacity>
             )}
@@ -566,12 +578,15 @@ export default function AddScreen() {
           style={[styles.submitButton, loading && styles.submitButtonDisabled]}
           onPress={handleSubmit}
           disabled={loading}
+          accessibilityRole="button"
+          accessibilityLabel={loading ? 'Listing book' : 'List book'}
+          accessibilityState={{ disabled: loading }}
         >
           {loading ? (
-            <ActivityIndicator color="#FBF3F2" />
+            <ActivityIndicator color={colors.text} />
           ) : (
             <>
-              <Upload size={20} color="#FBF3F2" />
+              <Upload size={20} color={colors.text} />
               <Text style={styles.submitButtonText}>List Book</Text>
             </>
           )}
@@ -584,21 +599,21 @@ export default function AddScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   header: {
     padding: 20,
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginTop: 12,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
     marginTop: 4,
   },
@@ -609,21 +624,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: fontSizes[18],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 12,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 12,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     marginBottom: 12,
     paddingHorizontal: 16,
@@ -634,8 +649,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 50,
-    color: '#032539',
-    fontSize: 16,
+    color: colors.background,
+    fontSize: fontSizes[16],
   },
   textAreaContainer: {
     alignItems: 'flex-start',
@@ -651,22 +666,22 @@ const styles = StyleSheet.create({
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
   },
   categoryButtonActive: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   },
   categoryButtonText: {
-    color: '#1C768F',
-    fontSize: 14,
+    color: colors.surface,
+    fontSize: fontSizes[14],
     marginLeft: 6,
   },
   categoryButtonTextActive: {
-    color: '#FBF3F2',
+    color: colors.text,
   },
   optionsGrid: {
     gap: 12,
@@ -680,22 +695,22 @@ const styles = StyleSheet.create({
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
   },
   optionButtonActive: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
   },
   optionButtonText: {
-    color: '#1C768F',
-    fontSize: 14,
+    color: colors.surface,
+    fontSize: fontSizes[14],
     marginLeft: 6,
   },
   optionButtonTextActive: {
-    color: '#FBF3F2',
+    color: colors.text,
   },
   imageGrid: {
     flexDirection: 'row',
@@ -724,39 +739,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   removeImageText: {
-    color: '#FBF3F2',
-    fontSize: 18,
+    color: colors.text,
+    fontSize: fontSizes[18],
     fontWeight: 'bold',
   },
   addImageButton: {
     width: 100,
     height: 100,
-    backgroundColor: '#FBF3F2',
+    backgroundColor: colors.text,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   addImageText: {
-    color: '#1C768F',
-    fontSize: 14,
+    color: colors.surface,
+    fontSize: fontSizes[14],
     marginTop: 8,
   },
   errorContainer: {
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     margin: 20,
     padding: 12,
     borderRadius: 8,
   },
   errorText: {
-    color: '#032539',
-    fontSize: 14,
+    color: colors.background,
+    fontSize: fontSizes[14],
     textAlign: 'center',
   },
   submitButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     marginTop: 24,
@@ -765,8 +780,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   submitButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
     marginLeft: 8,
   },

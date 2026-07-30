@@ -1,6 +1,7 @@
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
+import { fontSizes } from '@/src/presentation/theme/tokens';
 
 export default function NotFoundScreen() {
   return (
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: '600',
   },
   link: {

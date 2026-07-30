@@ -15,6 +15,7 @@ import { UserPlus, UserMinus, BookOpen } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
+import { colors, fontSizes } from '@/src/presentation/theme/tokens';
 
 const windowWidth = Dimensions.get('window').width;
 const GRID_SPACING = 16;
@@ -151,7 +152,7 @@ export default function UserProfileScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FA991C" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
@@ -164,6 +165,8 @@ export default function UserProfileScreen() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
@@ -201,17 +204,20 @@ export default function UserProfileScreen() {
               ]}
               onPress={toggleFollow}
               disabled={followLoading}
+              accessibilityRole="button"
+              accessibilityLabel={isFollowing ? `Unfollow ${profile.first_name} ${profile.last_name}` : `Follow ${profile.first_name} ${profile.last_name}`}
+              accessibilityState={{ selected: isFollowing, disabled: followLoading }}
             >
               {followLoading ? (
-                <ActivityIndicator color="#FBF3F2" size="small" />
+                <ActivityIndicator color={colors.text} size="small" />
               ) : isFollowing ? (
                 <>
-                  <UserMinus size={20} color="#FBF3F2" />
+                  <UserMinus size={20} color={colors.text} />
                   <Text style={styles.followButtonText}>Following</Text>
                 </>
               ) : (
                 <>
-                  <UserPlus size={20} color="#FBF3F2" />
+                  <UserPlus size={20} color={colors.text} />
                   <Text style={styles.followButtonText}>Follow</Text>
                 </>
               )}
@@ -221,7 +227,7 @@ export default function UserProfileScreen() {
 
         <View style={styles.booksSection}>
           <View style={styles.sectionHeader}>
-            <BookOpen size={24} color="#FA991C" />
+            <BookOpen size={24} color={colors.primary} />
             <Text style={styles.sectionTitle}>Listed Books</Text>
             <Text style={styles.bookCount}>
               {books.length} {books.length === 1 ? 'book' : 'books'}
@@ -235,6 +241,8 @@ export default function UserProfileScreen() {
                   key={book.id}
                   style={styles.bookCard}
                   onPress={() => router.push(`/book/${book.id}`)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Open ${book.title}`}
                 >
                   <Image
                     source={{ uri: book.images[0] }}
@@ -262,7 +270,7 @@ export default function UserProfileScreen() {
             </View>
           ) : (
             <View style={styles.emptyBooks}>
-              <BookOpen size={48} color="#1C768F" />
+              <BookOpen size={48} color={colors.surface} />
               <Text style={styles.emptyText}>No books listed yet</Text>
             </View>
           )}
@@ -275,7 +283,7 @@ export default function UserProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
@@ -289,27 +297,27 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
     marginBottom: 16,
   },
   profileInfo: {
     alignItems: 'center',
   },
   name: {
-    fontSize: 24,
+    fontSize: fontSizes[24],
     fontWeight: 'bold',
-    color: '#FBF3F2',
+    color: colors.text,
     marginBottom: 4,
   },
   username: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     opacity: 0.8,
     marginBottom: 12,
   },
   bio: {
-    fontSize: 14,
-    color: '#FBF3F2',
+    fontSize: fontSizes[14],
+    color: colors.text,
     opacity: 0.9,
     textAlign: 'center',
     marginBottom: 16,
@@ -317,20 +325,20 @@ const styles = StyleSheet.create({
   followButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FA991C',
+    backgroundColor: colors.primary,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
     gap: 8,
   },
   followingButton: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: '#FA991C',
+    borderColor: colors.primary,
   },
   followButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
   buttonDisabled: {
@@ -346,14 +354,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: fontSizes[20],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
     flex: 1,
   },
   bookCount: {
-    fontSize: 14,
-    color: '#FA991C',
+    fontSize: fontSizes[14],
+    color: colors.primary,
     fontWeight: '500',
   },
   booksGrid: {
@@ -363,36 +371,36 @@ const styles = StyleSheet.create({
   },
   bookCard: {
     width: ITEM_WIDTH,
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     overflow: 'hidden',
   },
   bookImage: {
     width: '100%',
     height: ITEM_WIDTH * 1.5,
-    backgroundColor: '#0D1B2A',
+    backgroundColor: colors.badgeBackground,
   },
   bookInfo: {
     padding: 12,
     gap: 4,
   },
   bookTitle: {
-    fontSize: 14,
+    fontSize: fontSizes[14],
     fontWeight: '600',
-    color: '#FBF3F2',
+    color: colors.text,
   },
   bookAuthor: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     opacity: 0.8,
   },
   bookPrice: {
-    fontSize: 16,
+    fontSize: fontSizes[16],
     fontWeight: 'bold',
-    color: '#FA991C',
+    color: colors.primary,
   },
   bookCondition: {
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
@@ -400,47 +408,47 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   conditionText: {
-    fontSize: 12,
-    color: '#FBF3F2',
+    fontSize: fontSizes[12],
+    color: colors.text,
     fontWeight: '500',
   },
   emptyBooks: {
     padding: 32,
     alignItems: 'center',
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     borderRadius: 12,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
     marginTop: 16,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
-    color: '#FBF3F2',
+    fontSize: fontSizes[16],
+    color: colors.text,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#032539',
+    backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: 18,
-    color: '#FA991C',
+    fontSize: fontSizes[18],
+    color: colors.primary,
     marginBottom: 16,
     textAlign: 'center',
   },
   backButton: {
-    backgroundColor: '#1C768F',
+    backgroundColor: colors.surface,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -449,8 +457,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   backButtonText: {
-    color: '#FBF3F2',
-    fontSize: 16,
+    color: colors.text,
+    fontSize: fontSizes[16],
     fontWeight: '600',
   },
 });
