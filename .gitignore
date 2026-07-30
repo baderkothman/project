@@ -37,3 +37,5 @@ server/uploads/
 
 # typescript
 *.tsbuildinfo
+
+graphify-out/
