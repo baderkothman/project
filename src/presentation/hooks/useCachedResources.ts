@@ -13,6 +13,10 @@ export function useCachedResources() {
           'Inter-Regular': require('@expo-google-fonts/inter/Inter_400Regular.ttf'),
           'Inter-Medium': require('@expo-google-fonts/inter/Inter_500Medium.ttf'),
           'Inter-Bold': require('@expo-google-fonts/inter/Inter_700Bold.ttf'),
+          'RobotoSlab-SemiBold': require('@expo-google-fonts/roboto-slab/600SemiBold/RobotoSlab_600SemiBold.ttf'),
+          'RobotoSlab-Bold': require('@expo-google-fonts/roboto-slab/700Bold/RobotoSlab_700Bold.ttf'),
+          'SpaceMono-Regular': require('@expo-google-fonts/space-mono/400Regular/SpaceMono_400Regular.ttf'),
+          'SpaceMono-Bold': require('@expo-google-fonts/space-mono/700Bold/SpaceMono_700Bold.ttf'),
         });
 
         // Pre-load images
