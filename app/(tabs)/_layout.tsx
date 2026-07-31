@@ -56,7 +56,7 @@ export default function TabLayout() {
               <View style={styles.authButtons}>
                 <Link href="/(auth)/login" asChild>
                   <TouchableOpacity
-                    style={[styles.iconButton, styles.emptyProfileButton]}
+                    style={StyleSheet.flatten([styles.iconButton, styles.emptyProfileButton])}
                     accessibilityRole="button"
                     accessibilityLabel="Sign in"
                   >

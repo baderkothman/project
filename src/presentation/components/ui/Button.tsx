@@ -35,14 +35,14 @@ export function Button({
   const isDisabled = disabled || loading;
   return (
     <TouchableOpacity
-      style={[
+      style={StyleSheet.flatten([
         styles.base,
         variant === 'primary' && styles.primary,
         variant === 'secondary' && styles.secondary,
         variant === 'ghost' && styles.ghost,
         isDisabled && styles.disabled,
         style,
-      ]}
+      ])}
       onPress={onPress}
       disabled={isDisabled}
       accessibilityRole="button"
