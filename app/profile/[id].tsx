@@ -15,7 +15,8 @@ import { UserPlus, UserMinus, BookOpen } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, radius, type } from '@/src/presentation/theme/tokens';
+import { Card, Button, EmptyState } from '@/src/presentation/components/ui';
 
 const windowWidth = Dimensions.get('window').width;
 const GRID_SPACING = 16;
@@ -162,14 +163,12 @@ export default function UserProfileScreen() {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Profile not found</Text>
-        <TouchableOpacity
-          style={styles.backButton}
+        <Button
+          label="Go Back"
           onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Text style={styles.backButtonText}>Go Back</Text>
-        </TouchableOpacity>
+          variant="secondary"
+          style={styles.backButton}
+        />
       </View>
     );
   }
@@ -179,12 +178,12 @@ export default function UserProfileScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.profileSection}>
           <Image
-            source={{ 
+            source={{
               uri: profile?.avatar_url || 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?w=400&q=80'
             }}
             style={styles.avatar}
           />
-          
+
           <View style={styles.profileInfo}>
             <Text style={styles.name}>
               {profile.first_name} {profile.last_name}
@@ -196,32 +195,21 @@ export default function UserProfileScreen() {
           </View>
 
           {session?.user?.id !== id && (
-            <TouchableOpacity
-              style={[
-                styles.followButton,
-                isFollowing && styles.followingButton,
-                followLoading && styles.buttonDisabled
-              ]}
+            <Button
+              label={isFollowing ? 'Following' : 'Follow'}
               onPress={toggleFollow}
-              disabled={followLoading}
-              accessibilityRole="button"
-              accessibilityLabel={isFollowing ? `Unfollow ${profile.first_name} ${profile.last_name}` : `Follow ${profile.first_name} ${profile.last_name}`}
-              accessibilityState={{ selected: isFollowing, disabled: followLoading }}
-            >
-              {followLoading ? (
-                <ActivityIndicator color={colors.text} size="small" />
-              ) : isFollowing ? (
-                <>
+              variant={isFollowing ? 'secondary' : 'primary'}
+              loading={followLoading}
+              icon={
+                isFollowing ? (
                   <UserMinus size={20} color={colors.text} />
-                  <Text style={styles.followButtonText}>Following</Text>
-                </>
-              ) : (
-                <>
-                  <UserPlus size={20} color={colors.text} />
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </>
-              )}
-            </TouchableOpacity>
+                ) : (
+                  <UserPlus size={20} color={colors.onPrimary} />
+                )
+              }
+              style={styles.followButton}
+              accessibilityLabel={isFollowing ? `Unfollow ${profile.first_name} ${profile.last_name}` : `Follow ${profile.first_name} ${profile.last_name}`}
+            />
           )}
         </View>
 
@@ -269,10 +257,10 @@ export default function UserProfileScreen() {
               ))}
             </View>
           ) : (
-            <View style={styles.emptyBooks}>
-              <BookOpen size={48} color={colors.surface} />
-              <Text style={styles.emptyText}>No books listed yet</Text>
-            </View>
+            <EmptyState
+              icon={<BookOpen size={48} color={colors.textMuted} />}
+              title="No books listed yet"
+            />
           )}
         </View>
       </ScrollView>
@@ -289,7 +277,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileSection: {
-    padding: 20,
+    padding: spacing.lg,
     alignItems: 'center',
   },
   avatar: {
@@ -298,71 +286,47 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 3,
     borderColor: colors.primary,
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   profileInfo: {
     alignItems: 'center',
   },
   name: {
-    fontSize: fontSizes[24],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   username: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
-    marginBottom: 12,
+    ...type.caption,
+    color: colors.textMuted,
+    marginBottom: spacing.sm,
   },
   bio: {
-    fontSize: fontSizes[14],
+    ...type.body,
     color: colors.text,
-    opacity: 0.9,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   followButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    gap: 8,
-  },
-  followingButton: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  followButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
+    paddingHorizontal: spacing.md,
   },
   booksSection: {
-    padding: 20,
+    padding: spacing.lg,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 8,
+    marginBottom: spacing.lg,
+    gap: spacing.xs,
   },
   sectionTitle: {
-    fontSize: fontSizes[20],
-    fontWeight: '600',
+    ...type.heading,
     color: colors.text,
     flex: 1,
   },
   bookCount: {
-    fontSize: fontSizes[14],
+    ...type.label,
     color: colors.primary,
-    fontWeight: '500',
   },
   booksGrid: {
     flexDirection: 'row',
@@ -371,8 +335,10 @@ const styles = StyleSheet.create({
   },
   bookCard: {
     width: ITEM_WIDTH,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     overflow: 'hidden',
   },
   bookImage: {
@@ -381,47 +347,32 @@ const styles = StyleSheet.create({
     backgroundColor: colors.badgeBackground,
   },
   bookInfo: {
-    padding: 12,
-    gap: 4,
+    padding: spacing.sm,
+    gap: spacing.xxs,
   },
   bookTitle: {
-    fontSize: fontSizes[14],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
   },
   bookAuthor: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
   },
   bookPrice: {
-    fontSize: fontSizes[16],
-    fontWeight: 'bold',
+    ...type.bodyStrong,
     color: colors.primary,
   },
   bookCondition: {
     backgroundColor: colors.background,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+    paddingVertical: spacing.xxs,
+    paddingHorizontal: spacing.xs,
+    borderRadius: radius.sm,
     alignSelf: 'flex-start',
-    marginTop: 4,
+    marginTop: spacing.xxs,
   },
   conditionText: {
-    fontSize: fontSizes[12],
+    ...type.caption,
     color: colors.text,
-    fontWeight: '500',
-  },
-  emptyBooks: {
-    padding: 32,
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-  },
-  emptyText: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    marginTop: 16,
   },
   loadingContainer: {
     flex: 1,
@@ -430,35 +381,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: fontSizes[16],
+    ...type.body,
+    marginTop: spacing.sm,
     color: colors.text,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: fontSizes[18],
+    ...type.heading,
     color: colors.primary,
-    marginBottom: 16,
+    marginBottom: spacing.md,
     textAlign: 'center',
   },
   backButton: {
-    backgroundColor: colors.surface,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  backButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
 });

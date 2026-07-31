@@ -10,7 +10,6 @@ import {
   Platform,
   Linking,
   Modal,
-  TextInput,
   FlatList,
 } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
@@ -19,7 +18,8 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import { getGoogleBook } from '@/src/application/services/google-books';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, type } from '@/src/presentation/theme/tokens';
+import { Button, Card, Input, Stamp } from '@/src/presentation/components/ui';
 
 interface GoogleBook {
   id: string;
@@ -366,7 +366,7 @@ export default function GoogleBookDetails() {
             </Text>
           </View>
 
-          <View style={styles.detailsGrid}>
+          <Card style={styles.detailsGrid}>
             {book.volumeInfo.language && (
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>Language</Text>
@@ -391,16 +391,16 @@ export default function GoogleBookDetails() {
                 </Text>
               </View>
             )}
-          </View>
+          </Card>
 
           {book.volumeInfo.categories && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Categories</Text>
               <View style={styles.categories}>
                 {book.volumeInfo.categories.map((category, index) => (
-                  <View key={index} style={styles.categoryBadge}>
-                    <Text style={styles.categoryText}>{category}</Text>
-                  </View>
+                  <Stamp key={index} tone="ink">
+                    {category.toUpperCase()}
+                  </Stamp>
                 ))}
               </View>
             </View>
@@ -409,29 +409,20 @@ export default function GoogleBookDetails() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={[
-            styles.previewButton,
-            !book.volumeInfo.previewLink && styles.buttonDisabled
-          ]}
+        <Button
+          label="Download"
           onPress={handlePreview}
           disabled={!book.volumeInfo.previewLink}
-          accessibilityRole="button"
-          accessibilityLabel="Download"
-          accessibilityState={{ disabled: !book.volumeInfo.previewLink }}
-        >
-          <Download size={24} color={colors.text} />
-          <Text style={styles.buttonText}>Download</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.infoButton}
+          icon={<Download size={20} color={colors.onPrimary} />}
+          style={styles.previewButton}
+        />
+        <Button
+          label="Preview"
           onPress={() => Linking.openURL(book.volumeInfo.previewLink || '')}
-          accessibilityRole="button"
-          accessibilityLabel="Preview"
-        >
-          <BookOpen size={24} color={colors.text} />
-          <Text style={styles.buttonText}>Preview</Text>
-        </TouchableOpacity>
+          variant="secondary"
+          icon={<BookOpen size={20} color={colors.text} />}
+          style={styles.infoButton}
+        />
       </View>
 
       <Modal
@@ -454,15 +445,12 @@ export default function GoogleBookDetails() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search friends..."
-                placeholderTextColor={colors.surface}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
+            <Input
+              style={styles.searchInput}
+              placeholder="Search friends..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
 
             {loadingFollowers ? (
               <View style={styles.loadingFollowers}>
@@ -560,38 +548,30 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: fontSizes[28],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
     marginBottom: 8,
   },
   author: {
-    fontSize: fontSizes[18],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
     marginBottom: 16,
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: fontSizes[20],
-    fontWeight: '600',
+    ...type.heading,
     color: colors.text,
     marginBottom: 12,
   },
   description: {
-    fontSize: fontSizes[16],
-    lineHeight: 24,
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
   },
   detailsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
     marginBottom: 24,
   },
   detailItem: {
@@ -601,30 +581,23 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   detailLabel: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: fontSizes[16],
+    ...type.label,
     color: colors.text,
-    fontWeight: '600',
   },
   categories: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  categoryBadge: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
+  categoryBadge: {},
   categoryText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
   },
   footer: {
     flexDirection: 'row',
@@ -638,28 +611,13 @@ const styles = StyleSheet.create({
   },
   previewButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    height: 56,
-    borderRadius: 28,
-    gap: 8,
   },
   infoButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-    height: 56,
-    borderRadius: 28,
-    gap: 8,
   },
   buttonText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
@@ -668,8 +626,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
+    ...type.body,
     marginTop: 12,
-    fontSize: fontSizes[16],
     color: colors.text,
   },
   errorContainer: {
@@ -680,19 +638,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.primary,
     marginBottom: 20,
     textAlign: 'center',
   },
   backButtonText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(3, 37, 57, 0.9)',
+    backgroundColor: colors.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -710,23 +667,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalTitle: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   closeButton: {
     padding: 4,
   },
-  searchContainer: {
-    backgroundColor: colors.text,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
   searchInput: {
-    height: 50,
-    color: colors.background,
-    fontSize: fontSizes[16],
+    marginBottom: 16,
   },
   followersList: {
     maxHeight: 400,
@@ -757,32 +705,30 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   followerName: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
     marginBottom: 2,
   },
   followerUsername: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
   },
   loadingFollowers: {
     padding: 20,
     alignItems: 'center',
   },
   loadingFollowersText: {
+    ...type.caption,
     color: colors.text,
     marginTop: 8,
-    fontSize: fontSizes[14],
   },
   emptyFollowers: {
     padding: 20,
     alignItems: 'center',
   },
   emptyFollowersText: {
+    ...type.body,
     color: colors.text,
-    fontSize: fontSizes[16],
     textAlign: 'center',
   },
   toast: {
@@ -799,8 +745,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.danger,
   },
   toastText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '500',
   },
 });

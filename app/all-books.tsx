@@ -13,7 +13,8 @@ import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, BookOpen } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, fontFamily, fontSizes, type } from '@/src/presentation/theme/tokens';
+import { EmptyState, Stamp } from '@/src/presentation/components/ui';
 
 interface Book {
   id: string;
@@ -75,9 +76,9 @@ export default function AllBooksScreen() {
           by {item.author}
         </Text>
         <Text style={styles.bookPrice}>${item.price.toFixed(2)}</Text>
-        <View style={styles.bookCondition}>
-          <Text style={styles.conditionText}>{item.condition}</Text>
-        </View>
+        <Stamp tone="stamp" style={styles.bookCondition}>
+          {item.condition.toUpperCase()}
+        </Stamp>
       </View>
     </TouchableOpacity>
   );
@@ -123,10 +124,10 @@ export default function AllBooksScreen() {
           numColumns={2}
           columnWrapperStyle={styles.booksRow}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <BookOpen size={48} color={colors.primary} />
-              <Text style={styles.emptyText}>No books listed yet</Text>
-            </View>
+            <EmptyState
+              icon={<BookOpen size={48} color={colors.primary} />}
+              title="No books listed yet"
+            />
           }
         />
       )}
@@ -159,8 +160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
@@ -174,8 +174,10 @@ const styles = StyleSheet.create({
   },
   bookCard: {
     width: '48%',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceRaised,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 16,
     overflow: 'hidden',
   },
@@ -188,34 +190,23 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   bookTitle: {
-    fontSize: fontSizes[14],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
     marginBottom: 8,
   },
   bookPrice: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: fontSizes[16],
-    fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 8,
   },
   bookCondition: {
-    backgroundColor: colors.background,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
     alignSelf: 'flex-start',
-  },
-  conditionText: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    fontWeight: '500',
   },
   loadingContainer: {
     flex: 1,
@@ -223,8 +214,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
+    ...type.body,
     marginTop: 12,
-    fontSize: fontSizes[16],
     color: colors.text,
   },
   errorContainer: {
@@ -234,18 +225,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.onPrimary,
     textAlign: 'center',
-  },
-  emptyContainer: {
-    padding: 32,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    textAlign: 'center',
-    marginTop: 16,
   },
 });

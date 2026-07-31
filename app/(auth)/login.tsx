@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Image,
@@ -14,7 +13,8 @@ import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, LogIn } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, radius, type } from '@/src/presentation/theme/tokens';
+import { Button, Card, Input } from '@/src/presentation/components/ui';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -72,46 +72,38 @@ export default function LoginScreen() {
             </View>
           )}
 
-          <View style={styles.inputContainer}>
-            <Mail size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
+          <Card style={styles.formCard}>
+            <Input
               accessibilityLabel="Email address"
-              style={styles.input}
+              icon={<Mail size={20} color={colors.textMuted} />}
               placeholder="Email"
-              placeholderTextColor={colors.surface}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
               autoComplete="email"
               keyboardType="email-address"
             />
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Lock size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
+            <Input
               accessibilityLabel="Password"
-              style={styles.input}
+              icon={<Lock size={20} color={colors.textMuted} />}
               placeholder="Password"
-              placeholderTextColor={colors.surface}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               autoComplete="current-password"
             />
-          </View>
+          </Card>
 
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="Sign in"
-            style={[styles.button, loading && styles.buttonDisabled]}
+          <Button
+            label={loading ? 'Signing in...' : 'Sign In'}
             onPress={handleLogin}
-            disabled={loading}>
-            <LogIn size={20} color={colors.text} />
-            <Text style={styles.buttonText}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Text>
-          </TouchableOpacity>
+            loading={loading}
+            disabled={loading}
+            icon={<LogIn size={20} color={colors.onPrimary} />}
+            accessibilityLabel="Sign in"
+            style={styles.submitButton}
+          />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account?</Text>
@@ -138,7 +130,7 @@ const styles = StyleSheet.create({
   header: {
     height: 300,
     justifyContent: 'flex-end',
-    padding: 20,
+    padding: spacing.lg,
   },
   headerImage: {
     ...StyleSheet.absoluteFill,
@@ -147,82 +139,52 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(3, 37, 57, 0.7)',
+    backgroundColor: colors.overlay,
   },
   title: {
-    fontSize: fontSizes[32],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: spacing.xxs,
   },
   subtitle: {
-    fontSize: fontSizes[18],
-    color: colors.text,
-    opacity: 0.9,
+    ...type.body,
+    color: colors.textMuted,
   },
   form: {
-    padding: 20,
+    padding: spacing.lg,
   },
   errorContainer: {
-    backgroundColor: colors.primary,
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    backgroundColor: colors.warningBackground,
+    borderWidth: 1,
+    borderColor: colors.danger,
+    padding: spacing.sm,
+    borderRadius: radius.sm,
+    marginBottom: spacing.md,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.label,
+    color: colors.danger,
     textAlign: 'center',
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.text,
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+  formCard: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    color: colors.background,
-    fontSize: fontSizes[16],
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
-    marginLeft: 8,
+  submitButton: {
+    marginTop: spacing.xxs,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: spacing.lg,
   },
   footerText: {
-    color: colors.text,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.textMuted,
   },
   footerLink: {
+    ...type.label,
     color: colors.primary,
-    fontSize: fontSizes[14],
-    fontWeight: '600',
-    marginLeft: 4,
   },
 });

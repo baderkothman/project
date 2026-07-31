@@ -17,7 +17,8 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, type } from '@/src/presentation/theme/tokens';
+import { Input } from '@/src/presentation/components/ui';
 
 interface Book {
   id: string;
@@ -296,7 +297,7 @@ export default function EditBookScreen() {
           accessibilityLabel={saving ? 'Saving book' : 'Save book'}
           accessibilityState={{ disabled: saving }}
         >
-          <Save size={24} color={colors.text} />
+          <Save size={24} color={colors.onPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -310,34 +311,30 @@ export default function EditBookScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Book Details</Text>
 
-          <View style={styles.inputContainer}>
-            <BookOpen size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
+          <View style={styles.inputSpacing}>
+            <Input
+              icon={<BookOpen size={20} color={colors.textMuted} />}
               placeholder="Book Title"
-              placeholderTextColor={colors.surface}
               value={book.title}
               onChangeText={(text) => setBook({ ...book, title: text })}
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <User size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
+          <View style={styles.inputSpacing}>
+            <Input
+              icon={<User size={20} color={colors.textMuted} />}
               placeholder="Author"
-              placeholderTextColor={colors.surface}
               value={book.author}
               onChangeText={(text) => setBook({ ...book, author: text })}
             />
           </View>
 
           <View style={[styles.inputContainer, styles.textAreaContainer]}>
-            <Info size={20} color={colors.surface} style={styles.inputIcon} />
+            <Info size={20} color={colors.textMuted} style={styles.inputIcon} />
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Description"
-              placeholderTextColor={colors.surface}
+              placeholderTextColor={colors.textMuted}
               value={book.description}
               onChangeText={(text) => setBook({ ...book, description: text })}
               multiline
@@ -365,9 +362,9 @@ export default function EditBookScreen() {
                 accessibilityLabel={category}
                 accessibilityState={{ checked: book.category === category }}
               >
-                <LayoutGrid 
-                  size={16} 
-                  color={book.category === category ? colors.text : colors.surface} 
+                <LayoutGrid
+                  size={16}
+                  color={book.category === category ? colors.onPrimary : colors.inkMuted}
                 />
                 <Text 
                   style={[
@@ -402,9 +399,9 @@ export default function EditBookScreen() {
                 accessibilityLabel={lang.name}
                 accessibilityState={{ checked: book.language === lang.code }}
               >
-                <Languages 
-                  size={16} 
-                  color={book.language === lang.code ? colors.text : colors.surface} 
+                <Languages
+                  size={16}
+                  color={book.language === lang.code ? colors.onPrimary : colors.inkMuted}
                 />
                 <Text 
                   style={[
@@ -435,9 +432,9 @@ export default function EditBookScreen() {
                 accessibilityLabel={condition}
                 accessibilityState={{ checked: book.condition === condition }}
               >
-                <Info 
-                  size={16} 
-                  color={book.condition === condition ? colors.text : colors.surface} 
+                <Info
+                  size={16}
+                  color={book.condition === condition ? colors.onPrimary : colors.inkMuted}
                 />
                 <Text 
                   style={[
@@ -455,47 +452,39 @@ export default function EditBookScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Additional Information</Text>
 
-          <View style={styles.inputContainer}>
-            <DollarSign size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
+          <View style={styles.inputSpacing}>
+            <Input
+              icon={<DollarSign size={20} color={colors.textMuted} />}
               placeholder="Price"
-              placeholderTextColor={colors.surface}
               value={book.price.toString()}
               onChangeText={(text) => setBook({ ...book, price: parseFloat(text) || 0 })}
               keyboardType="numeric"
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <BookOpen size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
+          <View style={styles.inputSpacing}>
+            <Input
+              icon={<BookOpen size={20} color={colors.textMuted} />}
               placeholder="Number of Pages"
-              placeholderTextColor={colors.surface}
               value={book.pages?.toString() || ''}
               onChangeText={(text) => setBook({ ...book, pages: parseInt(text) || null })}
               keyboardType="numeric"
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Info size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
+          <View style={styles.inputSpacing}>
+            <Input
+              icon={<Info size={20} color={colors.textMuted} />}
               placeholder="ISBN (optional)"
-              placeholderTextColor={colors.surface}
               value={book.isbn || ''}
               onChangeText={(text) => setBook({ ...book, isbn: text })}
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Globe2 size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
+          <View style={styles.inputSpacing}>
+            <Input
+              icon={<Globe2 size={20} color={colors.textMuted} />}
               placeholder="Location"
-              placeholderTextColor={colors.surface}
               value={book.location || ''}
               onChangeText={(text) => setBook({ ...book, location: text })}
             />
@@ -527,7 +516,7 @@ export default function EditBookScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Add photo"
               >
-                <Camera size={24} color={colors.surface} />
+                <Camera size={24} color={colors.inkMuted} />
                 <Text style={styles.addImageText}>Add Photo</Text>
               </TouchableOpacity>
             )}
@@ -563,8 +552,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   saveButton: {
@@ -585,33 +573,37 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.heading,
     color: colors.text,
     marginBottom: 12,
   },
   sectionSubtitle: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
     marginBottom: 12,
+  },
+  inputSpacing: {
+    marginBottom: spacing.sm,
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.text,
+    alignItems: 'flex-start',
+    backgroundColor: colors.surface,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 12,
     paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   inputIcon: {
     marginRight: 12,
+    marginTop: 2,
   },
   input: {
     flex: 1,
-    height: 50,
-    color: colors.background,
-    fontSize: fontSizes[16],
+    ...type.body,
+    color: colors.text,
   },
   textAreaContainer: {
     alignItems: 'flex-start',
@@ -627,22 +619,22 @@ const styles = StyleSheet.create({
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
+    backgroundColor: colors.kraft,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
   },
   categoryButtonActive: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primary,
   },
   categoryButtonText: {
-    color: colors.surface,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.ink,
     marginLeft: 6,
   },
   categoryButtonTextActive: {
-    color: colors.text,
+    color: colors.onPrimary,
   },
   optionsContainer: {
     marginBottom: 12,
@@ -650,22 +642,22 @@ const styles = StyleSheet.create({
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
+    backgroundColor: colors.kraft,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
   },
   optionButtonActive: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primary,
   },
   optionButtonText: {
-    color: colors.surface,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.ink,
     marginLeft: 6,
   },
   optionButtonTextActive: {
-    color: colors.text,
+    color: colors.onPrimary,
   },
   imageGrid: {
     flexDirection: 'row',
@@ -696,14 +688,14 @@ const styles = StyleSheet.create({
   addImageButton: {
     width: 100,
     height: 100,
-    backgroundColor: colors.text,
+    backgroundColor: colors.kraft,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   addImageText: {
-    color: colors.surface,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.inkMuted,
     marginTop: 8,
   },
   loadingContainer: {
@@ -713,8 +705,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
+    ...type.body,
     marginTop: 12,
-    fontSize: fontSizes[16],
     color: colors.text,
   },
   errorContainer: {
@@ -725,15 +717,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: fontSizes[18],
+    ...type.heading,
     color: colors.primary,
     marginBottom: 20,
     textAlign: 'center',
   },
   backButtonText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
   },
   errorAlert: {
     margin: 20,
@@ -742,8 +733,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   errorAlertText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.onPrimary,
     textAlign: 'center',
   },
 });

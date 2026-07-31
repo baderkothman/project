@@ -4,7 +4,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   FlatList,
   KeyboardAvoidingView,
@@ -18,7 +17,8 @@ import { Send, ArrowLeft, Info } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, radius, type } from '@/src/presentation/theme/tokens';
+import { Card, Button, Input } from '@/src/presentation/components/ui';
 
 interface ChatItem {
   id: string;
@@ -77,7 +77,13 @@ function AnimatedChatItem({ item, isUserItem, handleBookPreview }: {
               resizeMode="cover"
             />
             <View style={styles.sharedBookInfo}>
-              <Text style={styles.sharedBookTitle} numberOfLines={2}>
+              <Text
+                style={[
+                  styles.sharedBookTitle,
+                  isUserItem ? styles.userSharedBookText : styles.otherSharedBookText
+                ]}
+                numberOfLines={2}
+              >
                 {item.book_data.title}
               </Text>
               <View style={styles.sharedBookAction}>
@@ -432,22 +438,23 @@ export default function ChatDetail() {
 
       {showUserInfo && (
         <TouchableOpacity
-          style={styles.userInfoPanel}
           onPress={handleUserPress}
           accessibilityRole="button"
           accessibilityLabel={`View ${displayName}'s profile`}
         >
-          <Image
-            source={{
-              uri: userProfile?.avatar_url ||
-                'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?w=400&q=80'
-            }}
-            style={styles.userAvatar}
-          />
-          <Text style={styles.userFullName}>
-            {userProfile?.first_name} {userProfile?.last_name}
-          </Text>
-          <Text style={styles.userUsername}>@{userProfile?.username}</Text>
+          <Card raised={false} style={styles.userInfoPanel}>
+            <Image
+              source={{
+                uri: userProfile?.avatar_url ||
+                  'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?w=400&q=80'
+              }}
+              style={styles.userAvatar}
+            />
+            <Text style={styles.userFullName}>
+              {userProfile?.first_name} {userProfile?.last_name}
+            </Text>
+            <Text style={styles.userUsername}>@{userProfile?.username}</Text>
+          </Card>
         </TouchableOpacity>
       )}
 
@@ -488,30 +495,24 @@ export default function ChatDetail() {
       />
 
       <View style={styles.inputContainer}>
-        <TextInput
+        <Input
           style={styles.input}
           value={newMessage}
           onChangeText={setNewMessage}
           placeholder="Type a message..."
-          placeholderTextColor={colors.surface}
           multiline
           maxLength={500}
           returnKeyType="send"
           onSubmitEditing={handleSend}
         />
-        <TouchableOpacity
-          style={[
-            styles.sendButton,
-            !newMessage.trim() && styles.sendButtonDisabled
-          ]}
+        <Button
+          label="Send"
           onPress={handleSend}
           disabled={!newMessage.trim()}
-          accessibilityRole="button"
+          icon={<Send size={18} color={colors.onPrimary} />}
+          style={styles.sendButton}
           accessibilityLabel="Send message"
-          accessibilityState={{ disabled: !newMessage.trim() }}
-        >
-          <Send size={20} color={colors.text} />
-        </TouchableOpacity>
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -527,52 +528,50 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
     paddingTop: Platform.OS === 'ios' ? 50 : 20,
-    paddingBottom: 15,
-    paddingHorizontal: 16,
+    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
-    padding: 8,
-    marginRight: 12,
+    padding: spacing.xs,
+    marginRight: spacing.sm,
   },
   userInfo: {
     flex: 1,
-    padding: 8,
+    padding: spacing.xs,
   },
   userName: {
+    ...type.bodyStrong,
     color: colors.text,
-    fontSize: fontSizes[18],
-    fontWeight: '600',
   },
   infoButton: {
-    padding: 8,
+    padding: spacing.xs,
   },
   userInfoPanel: {
     backgroundColor: colors.surface,
-    padding: 20,
+    padding: spacing.lg,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
+    borderRadius: 0,
   },
   userAvatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginBottom: 12,
+    marginBottom: spacing.sm,
     borderWidth: 3,
     borderColor: colors.primary,
   },
   userFullName: {
+    ...type.heading,
     color: colors.text,
-    fontSize: fontSizes[20],
-    fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   userUsername: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
   },
   loadingContainer: {
     flex: 1,
@@ -581,33 +580,33 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: fontSizes[16],
+    ...type.body,
+    marginTop: spacing.sm,
     color: colors.text,
   },
   loadingMore: {
-    padding: 16,
+    padding: spacing.md,
     alignItems: 'center',
   },
   errorContainer: {
-    padding: 12,
-    backgroundColor: colors.primary,
-    margin: 12,
-    borderRadius: 8,
+    padding: spacing.sm,
+    backgroundColor: colors.danger,
+    margin: spacing.sm,
+    borderRadius: radius.sm,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
   },
   messagesList: {
-    padding: 16,
+    padding: spacing.md,
   },
   messageContainer: {
     maxWidth: '80%',
-    padding: 12,
-    borderRadius: 16,
-    marginBottom: 8,
+    padding: spacing.sm,
+    borderRadius: radius.lg,
+    marginBottom: spacing.xs,
   },
   userMessage: {
     backgroundColor: colors.primary,
@@ -620,33 +619,32 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   messageText: {
-    fontSize: fontSizes[16],
-    lineHeight: 22,
+    ...type.body,
   },
   userMessageText: {
-    color: colors.background,
+    color: colors.onPrimary,
   },
   otherMessageText: {
     color: colors.text,
   },
   timestamp: {
-    fontSize: fontSizes[12],
-    marginTop: 4,
+    ...type.caption,
+    fontSize: 12,
+    marginTop: spacing.xxs,
     alignSelf: 'flex-end',
   },
   userTimestamp: {
-    color: colors.background,
+    color: colors.onPrimary,
     opacity: 0.8,
   },
   otherTimestamp: {
-    color: colors.text,
-    opacity: 0.7,
+    color: colors.textMuted,
   },
   sharedBookCard: {
     maxWidth: '80%',
-    padding: 12,
-    borderRadius: 16,
-    marginBottom: 8,
+    padding: spacing.sm,
+    borderRadius: radius.lg,
+    marginBottom: spacing.xs,
   },
   userSharedBook: {
     backgroundColor: colors.primary,
@@ -665,19 +663,18 @@ const styles = StyleSheet.create({
   sharedBookImage: {
     width: 60,
     height: 90,
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   sharedBookInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: spacing.sm,
   },
   sharedBookTitle: {
-    fontSize: fontSizes[14],
-    fontWeight: '600',
-    marginBottom: 8,
+    ...type.label,
+    marginBottom: spacing.xs,
   },
   userSharedBookText: {
-    color: colors.background,
+    color: colors.onPrimary,
   },
   otherSharedBookText: {
     color: colors.text,
@@ -685,40 +682,25 @@ const styles = StyleSheet.create({
   sharedBookAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: spacing.xxs,
   },
   sharedBookActionText: {
-    fontSize: fontSizes[14],
-    fontWeight: '500',
+    ...type.label,
   },
   inputContainer: {
     flexDirection: 'row',
-    padding: 16,
+    padding: spacing.md,
     backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.surface,
+    borderTopColor: colors.border,
     alignItems: 'flex-end',
+    gap: spacing.xs,
   },
   input: {
     flex: 1,
-    backgroundColor: colors.text,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
     maxHeight: 100,
-    color: colors.background,
-    fontSize: fontSizes[16],
   },
   sendButton: {
-    backgroundColor: colors.primary,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
   },
-  sendButtonDisabled: {
-    backgroundColor: colors.surface,
-  }
 });

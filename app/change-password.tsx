@@ -3,16 +3,15 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  ActivityIndicator,
   Platform,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, touchTarget, type } from '@/src/presentation/theme/tokens';
+import { Button, Input } from '@/src/presentation/components/ui';
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -116,92 +115,86 @@ export default function ChangePasswordScreen() {
           </View>
         )}
 
-        <View style={styles.inputContainer}>
-          <Lock size={20} color={colors.surface} style={styles.inputIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Current Password"
-            placeholderTextColor={colors.surface}
-            value={oldPassword}
-            onChangeText={setOldPassword}
-            secureTextEntry={!showOldPassword}
-          />
+        <View style={styles.inputRow}>
+          <View style={styles.inputFlex}>
+            <Input
+              icon={<Lock size={20} color={colors.textMuted} />}
+              placeholder="Current Password"
+              value={oldPassword}
+              onChangeText={setOldPassword}
+              secureTextEntry={!showOldPassword}
+            />
+          </View>
           <TouchableOpacity
-            style={styles.eyeIcon}
+            style={styles.eyeButton}
             onPress={() => setShowOldPassword(!showOldPassword)}
             accessibilityRole="button"
             accessibilityLabel={showOldPassword ? 'Hide current password' : 'Show current password'}
           >
             {showOldPassword ? (
-              <EyeOff size={20} color={colors.surface} />
+              <EyeOff size={20} color={colors.textMuted} />
             ) : (
-              <Eye size={20} color={colors.surface} />
+              <Eye size={20} color={colors.textMuted} />
             )}
           </TouchableOpacity>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Lock size={20} color={colors.surface} style={styles.inputIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="New Password"
-            placeholderTextColor={colors.surface}
-            value={newPassword}
-            onChangeText={setNewPassword}
-            secureTextEntry={!showNewPassword}
-          />
+        <View style={styles.inputRow}>
+          <View style={styles.inputFlex}>
+            <Input
+              icon={<Lock size={20} color={colors.textMuted} />}
+              placeholder="New Password"
+              value={newPassword}
+              onChangeText={setNewPassword}
+              secureTextEntry={!showNewPassword}
+            />
+          </View>
           <TouchableOpacity
-            style={styles.eyeIcon}
+            style={styles.eyeButton}
             onPress={() => setShowNewPassword(!showNewPassword)}
             accessibilityRole="button"
             accessibilityLabel={showNewPassword ? 'Hide new password' : 'Show new password'}
           >
             {showNewPassword ? (
-              <EyeOff size={20} color={colors.surface} />
+              <EyeOff size={20} color={colors.textMuted} />
             ) : (
-              <Eye size={20} color={colors.surface} />
+              <Eye size={20} color={colors.textMuted} />
             )}
           </TouchableOpacity>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Lock size={20} color={colors.surface} style={styles.inputIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm New Password"
-            placeholderTextColor={colors.surface}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={!showConfirmPassword}
-          />
+        <View style={styles.inputRow}>
+          <View style={styles.inputFlex}>
+            <Input
+              icon={<Lock size={20} color={colors.textMuted} />}
+              placeholder="Confirm New Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+          </View>
           <TouchableOpacity
-            style={styles.eyeIcon}
+            style={styles.eyeButton}
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}
             accessibilityRole="button"
             accessibilityLabel={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
           >
             {showConfirmPassword ? (
-              <EyeOff size={20} color={colors.surface} />
+              <EyeOff size={20} color={colors.textMuted} />
             ) : (
-              <Eye size={20} color={colors.surface} />
+              <Eye size={20} color={colors.textMuted} />
             )}
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+        <Button
+          label="Change Password"
           onPress={handleChangePassword}
+          loading={loading}
           disabled={loading}
-          accessibilityRole="button"
           accessibilityLabel={loading ? 'Changing password' : 'Change password'}
-          accessibilityState={{ disabled: loading }}
-        >
-          {loading ? (
-            <ActivityIndicator color={colors.text} />
-          ) : (
-            <Text style={styles.buttonText}>Change Password</Text>
-          )}
-        </TouchableOpacity>
+          style={styles.submitButton}
+        />
       </View>
     </View>
   );
@@ -216,12 +209,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -232,72 +225,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
     width: 40,
   },
   content: {
-    padding: 20,
+    padding: spacing.lg,
   },
   errorContainer: {
     backgroundColor: colors.danger,
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
+    padding: spacing.md,
+    borderRadius: radius.sm,
+    marginBottom: spacing.lg,
   },
   errorText: {
-    color: colors.text,
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
-    fontSize: fontSizes[14],
   },
   successContainer: {
-    backgroundColor: '#059669',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
+    backgroundColor: colors.success,
+    padding: spacing.md,
+    borderRadius: radius.sm,
+    marginBottom: spacing.lg,
   },
   successText: {
-    color: colors.text,
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
-    fontSize: fontSizes[14],
   },
-  inputContainer: {
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    gap: spacing.xs,
+    marginBottom: spacing.md,
   },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
+  inputFlex: {
     flex: 1,
-    height: 50,
-    color: colors.background,
-    fontSize: fontSizes[16],
   },
-  eyeIcon: {
-    padding: 8,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    height: 50,
-    borderRadius: 12,
+  eyeButton: {
+    minHeight: touchTarget.minHeight,
+    minWidth: touchTarget.minWidth,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
   },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+  submitButton: {
+    marginTop: spacing.xs,
   },
 });

@@ -17,7 +17,8 @@ import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { useRetry } from '@/src/presentation/hooks/useRetry';
 import ShareModal from '@/src/presentation/components/ShareModal';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type, fontFamily } from '@/src/presentation/theme/tokens';
+import { Button } from '@/src/presentation/components/ui';
 
 const windowWidth = Dimensions.get('window').width;
 const GRID_SPACING = 12;
@@ -227,12 +228,12 @@ export default function ProfileScreen() {
     }, [session?.user?.id, fetchUserProfile, fetchUserBooks, fetchFollowerCounts])
   );
 
-  
+
   const handleRetry = useCallback(async () => {
     setIsRetrying(true);
     setError(null);
     setLoading(true);
-    
+
     try {
       await Promise.all([
         fetchUserProfile(),
@@ -267,7 +268,7 @@ export default function ProfileScreen() {
 
   const ErrorDisplay = memo(() => (
     <View style={[styles.errorContainer, error?.isNetwork && styles.networkErrorContainer]}>
-      {error?.isNetwork && <WifiOff size={24} color={colors.background} style={styles.errorIcon} />}
+      {error?.isNetwork && <WifiOff size={24} color={colors.danger} style={styles.errorIcon} />}
       <Text style={styles.errorText}>{error?.message}</Text>
       <TouchableOpacity
         style={styles.retryButton}
@@ -295,43 +296,43 @@ export default function ProfileScreen() {
       </View>
     );
   }
-  
+
 
   return (
-    <ScrollView 
-      style={styles.container} 
+    <ScrollView
+      style={styles.container}
       showsVerticalScrollIndicator={false}
       removeClippedSubviews={Platform.OS !== 'web'}
     >
       {error && <ErrorDisplay />}
 
-      
+
       <View style={styles.header}>
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
             {isGuest ? (
               <View style={styles.emptyProfileImage} />
             ) : (
-              <MemoizedImage 
-                source={{ 
-                  uri: userProfile?.avatar_url || 
+              <MemoizedImage
+                source={{
+                  uri: userProfile?.avatar_url ||
   'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?w=400&q=80'
 
-                }} 
+                }}
                 style={styles.profileImage}
               />
             )}
           </View>
-          
+
           <View style={styles.statsContainer}>
             <StatItem value={stats.books} label="Books" />
-            <StatItem 
-              value={stats.followers} 
+            <StatItem
+              value={stats.followers}
               label="Followers"
               onPress={handleFollowersPress}
             />
-            <StatItem 
-              value={stats.following} 
+            <StatItem
+              value={stats.following}
               label="Following"
               onPress={handleFollowingPress}
             />
@@ -351,44 +352,37 @@ export default function ProfileScreen() {
 
         {isGuest ? (
           <View style={styles.authButtons}>
-            <TouchableOpacity
-              style={[styles.button, styles.followButton]}
+            <Button
+              label="Sign In"
               onPress={() => router.push('/login')}
-              accessibilityRole="button"
               accessibilityLabel="Sign in"
-            >
-              <LogIn size={20} color={colors.onDark} />
-              <Text style={styles.buttonText}>Sign In</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, styles.messageButton]}
+              icon={<LogIn size={20} color={colors.onPrimary} />}
+              style={styles.followButton}
+            />
+            <Button
+              label="Register"
               onPress={() => router.push('/signup')}
-              accessibilityRole="button"
+              variant="secondary"
               accessibilityLabel="Register"
-            >
-              <UserPlus size={20} color={colors.onDark} />
-              <Text style={styles.buttonText}>Register</Text>
-            </TouchableOpacity>
+              icon={<UserPlus size={20} color={colors.text} />}
+              style={styles.messageButton}
+            />
           </View>
         ) : (
           <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={[styles.button, styles.followButton]}
+            <Button
+              label="Edit Profile"
               onPress={() => router.push('/edit-profile')}
-              accessibilityRole="button"
               accessibilityLabel="Edit profile"
-            >
-              <Text style={styles.buttonText}>Edit Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.messageButton]}
+              style={styles.followButton}
+            />
+            <Button
+              label="Share Profile"
               onPress={() => setShowShareModal(true)}
-              accessibilityRole="button"
+              variant="secondary"
               accessibilityLabel="Share profile"
-            >
-              <Text style={styles.buttonText}>Share Profile</Text>
-            </TouchableOpacity>
+              style={styles.messageButton}
+            />
           </View>
         )}
       </View>
@@ -469,28 +463,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   statLabel: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
   },
   bioSection: {
     marginBottom: 24,
   },
   name: {
-    fontSize: fontSizes[24],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
     marginBottom: 4,
   },
   bio: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -500,31 +490,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    gap: 8,
-  },
   followButton: {
     flex: 1,
-    backgroundColor: colors.primary,
   },
   editButton: {
     flex: 1,
-    backgroundColor: colors.surface,
   },
   messageButton: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 16,
+    flex: 1,
   },
   buttonText: {
-    color: colors.onDark,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    color: colors.onPrimary,
+    ...type.label,
   },
   booksSection: {
     padding: 20,
@@ -536,14 +513,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.heading,
     color: colors.text,
   },
   viewAllButton: {
     color: colors.primary,
-    fontSize: fontSizes[14],
-    fontWeight: '500',
+    ...type.label,
   },
   booksGrid: {
     flexDirection: 'row',
@@ -553,33 +528,32 @@ const styles = StyleSheet.create({
   bookCard: {
     width: ITEM_WIDTH,
     margin: ITEM_MARGIN,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     overflow: 'hidden',
   },
   bookImage: {
     width: '100%',
-    aspectRatio: 3/4,
+    aspectRatio: 3 / 4,
     backgroundColor: colors.badgeBackground,
   },
   bookInfo: {
     padding: 12,
   },
   bookTitle: {
-    fontSize: fontSizes[14],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
     marginBottom: 4,
   },
   bookPrice: {
-    fontSize: fontSizes[14],
-    fontWeight: '600',
+    ...type.label,
     color: colors.primary,
   },
   loadingContainer: {
@@ -590,27 +564,28 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
   },
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.danger,
+    borderRadius: radius.sm,
     alignItems: 'center',
   },
   networkErrorContainer: {
     backgroundColor: colors.warningBackground,
-    borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.foil,
   },
   errorIcon: {
     marginBottom: 8,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    color: colors.text,
+    ...type.caption,
     textAlign: 'center',
     marginBottom: 12,
   },
@@ -618,7 +593,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: radius.pill,
   },
   retryButtonContent: {
     flexDirection: 'row',
@@ -627,8 +602,8 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: colors.text,
-    fontSize: fontSizes[14],
-    fontWeight: '600',
+    ...type.caption,
+    fontFamily: fontFamily.bodyBold,
   },
   spinningIcon: {
     transform: [{ rotate: '45deg' }],

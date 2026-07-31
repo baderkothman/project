@@ -14,7 +14,8 @@ import { ArrowLeft, UserMinus } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, radius, type } from '@/src/presentation/theme/tokens';
+import { Card, Button, EmptyState, ScreenHeader } from '@/src/presentation/components/ui';
 
 interface Profile {
   id: string;
@@ -78,38 +79,40 @@ export default function FollowingScreen() {
     const isCurrentUser = item.id === session?.user?.id;
 
     return (
-      <View style={styles.followingCard}>
-        <TouchableOpacity
-          style={styles.followingContent}
-          onPress={() => router.push(`/profile/${item.id}`)}
-          accessibilityRole="button"
-          accessibilityLabel={`View ${item.first_name} ${item.last_name}'s profile`}
-        >
-          <Image
-            source={{ 
-              uri: item.avatar_url || 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?w=400&q=80'
-            }}
-            style={styles.avatar}
-          />
-          <View style={styles.followingInfo}>
-            <Text style={styles.name}>
-              {item.first_name} {item.last_name}
-            </Text>
-            <Text style={styles.username}>@{item.username}</Text>
-          </View>
-        </TouchableOpacity>
-
-        {!isCurrentUser && session?.user?.id && (
+      <Card style={styles.followingCard}>
+        <View style={styles.followingRow}>
           <TouchableOpacity
-            style={styles.unfollowButton}
-            onPress={() => handleUnfollow(item.id)}
+            style={styles.followingContent}
+            onPress={() => router.push(`/profile/${item.id}`)}
             accessibilityRole="button"
-            accessibilityLabel={`Unfollow ${item.first_name} ${item.last_name}`}
+            accessibilityLabel={`View ${item.first_name} ${item.last_name}'s profile`}
           >
-            <UserMinus size={20} color={colors.text} />
+            <Image
+              source={{
+                uri: item.avatar_url || 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?w=400&q=80'
+              }}
+              style={styles.avatar}
+            />
+            <View style={styles.followingInfo}>
+              <Text style={styles.name}>
+                {item.first_name} {item.last_name}
+              </Text>
+              <Text style={styles.username}>@{item.username}</Text>
+            </View>
           </TouchableOpacity>
-        )}
-      </View>
+
+          {!isCurrentUser && session?.user?.id && (
+            <Button
+              label="Unfollow"
+              onPress={() => handleUnfollow(item.id)}
+              variant="secondary"
+              icon={<UserMinus size={18} color={colors.text} />}
+              style={styles.unfollowButton}
+              accessibilityLabel={`Unfollow ${item.first_name} ${item.last_name}`}
+            />
+          )}
+        </View>
+      </Card>
     );
   };
 
@@ -127,7 +130,9 @@ export default function FollowingScreen() {
             <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         </Link>
-        <Text style={styles.title}>Following</Text>
+        <View style={styles.headerTitle}>
+          <ScreenHeader title="Following" />
+        </View>
         <View style={styles.placeholder} />
       </View>
 
@@ -149,9 +154,7 @@ export default function FollowingScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.followingList}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Not following anyone yet</Text>
-            </View>
+            <EmptyState title="Not following anyone yet" />
           }
         />
       )}
@@ -168,39 +171,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: radius.pill,
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
-    color: colors.text,
+  headerTitle: {
+    flex: 1,
+    alignItems: 'center',
   },
   placeholder: {
     width: 40,
   },
   followingList: {
-    padding: 16,
+    padding: spacing.md,
   },
   followingCard: {
+    marginBottom: spacing.sm,
+  },
+  followingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    marginBottom: 12,
-    padding: 12,
   },
   followingContent: {
     flex: 1,
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginRight: 12,
+    marginRight: spacing.sm,
     borderWidth: 2,
     borderColor: colors.primary,
   },
@@ -219,25 +220,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
     marginBottom: 2,
   },
   username: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
   },
   unfollowButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: spacing.sm,
   },
   loadingContainer: {
     flex: 1,
@@ -245,28 +237,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: fontSizes[16],
+    ...type.body,
+    marginTop: spacing.sm,
     color: colors.text,
   },
   errorContainer: {
-    padding: 16,
-    backgroundColor: colors.primary,
-    margin: 16,
-    borderRadius: 8,
+    padding: spacing.md,
+    backgroundColor: colors.danger,
+    margin: spacing.md,
+    borderRadius: radius.sm,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
-    textAlign: 'center',
-  },
-  emptyContainer: {
-    padding: 32,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: fontSizes[16],
-    color: colors.text,
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
   },
 });

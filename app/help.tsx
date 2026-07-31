@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import { Link } from 'expo-router';
 import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, MessageSquare, ShoppingBag, Settings, CircleHelp as HelpCircle, User } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type } from '@/src/presentation/theme/tokens';
+import { Card } from '@/src/presentation/components/ui';
 
 interface Section {
   id: string;
@@ -225,7 +225,7 @@ export default function HelpCenter() {
               </TouchableOpacity>
 
               {isExpanded && (
-                <View style={styles.sectionContent}>
+                <Card style={styles.sectionContent}>
                   {section.items.map((item, index) => {
                     const itemId = `${section.id}-${index}`;
                     const isItemExpanded = expandedItems.has(itemId);
@@ -251,7 +251,7 @@ export default function HelpCenter() {
                           {isItemExpanded ? (
                             <ChevronUp size={20} color={colors.primary} />
                           ) : (
-                            <ChevronDown size={20} color={colors.surface} />
+                            <ChevronDown size={20} color={colors.textMuted} />
                           )}
                         </TouchableOpacity>
                         {isItemExpanded && (
@@ -262,7 +262,7 @@ export default function HelpCenter() {
                       </View>
                     );
                   })}
-                </View>
+                </Card>
               )}
             </View>
           );
@@ -281,12 +281,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -297,8 +297,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
@@ -306,11 +305,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: spacing.md,
   },
   section: {
-    marginBottom: 16,
-    borderRadius: 12,
+    marginBottom: spacing.md,
+    borderRadius: radius.md,
     overflow: 'hidden',
   },
   sectionHeader: {
@@ -318,8 +317,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
   },
   sectionHeaderActive: {
     backgroundColor: colors.background,
@@ -329,20 +328,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.sm,
   },
   sectionTitleText: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.bodyStrong,
     color: colors.text,
   },
   sectionTitleTextActive: {
     color: colors.primary,
   },
   sectionContent: {
-    backgroundColor: colors.surface,
     marginTop: 2,
-    borderRadius: 12,
+    padding: 0,
     overflow: 'hidden',
   },
   item: {
@@ -353,27 +350,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: spacing.md,
   },
   itemHeaderActive: {
     backgroundColor: colors.background,
   },
   itemQuestion: {
     flex: 1,
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
-    marginRight: 8,
+    marginRight: spacing.xs,
   },
   itemQuestionActive: {
     color: colors.primary,
-    fontWeight: '500',
   },
   itemAnswer: {
-    fontSize: fontSizes[14],
-    lineHeight: 20,
-    color: colors.text,
-    opacity: 0.8,
-    padding: 16,
+    ...type.caption,
+    color: colors.textMuted,
+    padding: spacing.md,
     paddingTop: 0,
   },
 });

@@ -2,14 +2,12 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { Mail, Lock, UserPlus, User, Calendar } from 'lucide-react-native';
@@ -17,7 +15,8 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import 'react-native-url-polyfill/auto';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, radius, type, fontSizes } from '@/src/presentation/theme/tokens';
+import { Button, Card, Input, Stamp } from '@/src/presentation/components/ui';
 
 interface FormData {
   firstName: string;
@@ -143,17 +142,19 @@ export default function SignUpScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.confirmationContainer}>
+          <Stamp tone="bookplate" style={styles.confirmationStamp}>
+            Account Created
+          </Stamp>
           <Text style={styles.confirmationTitle}>Account created</Text>
           <Text style={styles.confirmationText}>
             Your local account is ready. You can start discovering and exchanging books now.
           </Text>
-          <TouchableOpacity
-            accessibilityRole="button"
+          <Button
+            label="Start Exploring"
+            onPress={() => router.replace('/(tabs)')}
             accessibilityLabel="Start exploring books"
             style={styles.loginButton}
-            onPress={() => router.replace('/(tabs)')}>
-            <Text style={styles.loginButtonText}>Start Exploring</Text>
-          </TouchableOpacity>
+          />
         </View>
       </View>
     );
@@ -177,148 +178,136 @@ export default function SignUpScreen() {
         </View>
 
         <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <User size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              accessibilityLabel="First name"
-              style={styles.input}
-              placeholder="First Name"
-              placeholderTextColor={colors.surface}
-              value={formData.firstName}
-              onChangeText={(text) =>
-                setFormData({ ...formData, firstName: text })
-              }
-            />
-          </View>
-          {errors.firstName && (
-            <Text style={styles.errorText}>{errors.firstName}</Text>
-          )}
-
-          <View style={styles.inputContainer}>
-            <User size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              accessibilityLabel="Last name"
-              style={styles.input}
-              placeholder="Last Name"
-              placeholderTextColor={colors.surface}
-              value={formData.lastName}
-              onChangeText={(text) =>
-                setFormData({ ...formData, lastName: text })
-              }
-            />
-          </View>
-          {errors.lastName && (
-            <Text style={styles.errorText}>{errors.lastName}</Text>
-          )}
-
-          <View style={styles.inputContainer}>
-            <Mail size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              accessibilityLabel="Email address"
-              style={styles.input}
-              placeholder="Email Address"
-              placeholderTextColor={colors.surface}
-              value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-            />
-          </View>
-          {errors.email && (
-            <Text style={styles.errorText}>{errors.email}</Text>
-          )}
-
-          <View style={styles.inputContainer}>
-            <Lock size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              accessibilityLabel="Password"
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor={colors.surface}
-              value={formData.password}
-              onChangeText={(text) =>
-                setFormData({ ...formData, password: text })
-              }
-              secureTextEntry
-              autoComplete="new-password"
-            />
-          </View>
-          {errors.password && (
-            <Text style={styles.errorText}>{errors.password}</Text>
-          )}
-
-          <View style={styles.inputContainer}>
-            <Lock size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              accessibilityLabel="Confirm password"
-              style={styles.input}
-              placeholder="Confirm Password"
-              placeholderTextColor={colors.surface}
-              value={formData.confirmPassword}
-              onChangeText={(text) =>
-                setFormData({ ...formData, confirmPassword: text })
-              }
-              secureTextEntry
-            />
-          </View>
-          {errors.confirmPassword && (
-            <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-          )}
-
-          {Platform.OS === 'web' ? (
-            <View style={styles.inputContainer}>
-              <Calendar size={20} color={colors.surface} style={styles.inputIcon} />
-              <input
-                type="date"
-                value={formData.birthdate.toISOString().split('T')[0]}
-                onChange={handleDateChange}
-                style={styles.webDateInput}
-                max={new Date().toISOString().split('T')[0]}
+          <Card style={styles.formCard}>
+            <View>
+              <Input
+                accessibilityLabel="First name"
+                icon={<User size={20} color={colors.textMuted} />}
+                placeholder="First Name"
+                value={formData.firstName}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, firstName: text })
+                }
               />
-            </View>
-          ) : (
-            <>
-              <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityLabel={`Birthdate, ${formData.birthdate.toLocaleDateString()}`}
-                style={styles.inputContainer}
-                onPress={() => setShowDatePicker(true)}>
-                <Calendar size={20} color={colors.surface} style={styles.inputIcon} />
-                <Text style={styles.dateText}>
-                  {formData.birthdate.toLocaleDateString()}
-                </Text>
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={formData.birthdate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleDateChange}
-                  maximumDate={new Date()}
-                />
+              {errors.firstName && (
+                <Text style={styles.errorText}>{errors.firstName}</Text>
               )}
-            </>
-          )}
-          {errors.birthdate && (
-            <Text style={styles.errorText}>{errors.birthdate}</Text>
-          )}
+            </View>
 
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="Create account"
-            style={[styles.button, loading && styles.buttonDisabled]}
+            <View>
+              <Input
+                accessibilityLabel="Last name"
+                icon={<User size={20} color={colors.textMuted} />}
+                placeholder="Last Name"
+                value={formData.lastName}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, lastName: text })
+                }
+              />
+              {errors.lastName && (
+                <Text style={styles.errorText}>{errors.lastName}</Text>
+              )}
+            </View>
+
+            <View>
+              <Input
+                accessibilityLabel="Email address"
+                icon={<Mail size={20} color={colors.textMuted} />}
+                placeholder="Email Address"
+                value={formData.email}
+                onChangeText={(text) => setFormData({ ...formData, email: text })}
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+              />
+              {errors.email && (
+                <Text style={styles.errorText}>{errors.email}</Text>
+              )}
+            </View>
+
+            <View>
+              <Input
+                accessibilityLabel="Password"
+                icon={<Lock size={20} color={colors.textMuted} />}
+                placeholder="Password"
+                value={formData.password}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, password: text })
+                }
+                secureTextEntry
+                autoComplete="new-password"
+              />
+              {errors.password && (
+                <Text style={styles.errorText}>{errors.password}</Text>
+              )}
+            </View>
+
+            <View>
+              <Input
+                accessibilityLabel="Confirm password"
+                icon={<Lock size={20} color={colors.textMuted} />}
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, confirmPassword: text })
+                }
+                secureTextEntry
+              />
+              {errors.confirmPassword && (
+                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+              )}
+            </View>
+
+            <View>
+              {Platform.OS === 'web' ? (
+                <View style={styles.inputContainer}>
+                  <Calendar size={20} color={colors.textMuted} style={styles.inputIcon} />
+                  <input
+                    type="date"
+                    value={formData.birthdate.toISOString().split('T')[0]}
+                    onChange={handleDateChange}
+                    style={styles.webDateInput}
+                    max={new Date().toISOString().split('T')[0]}
+                  />
+                </View>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={`Birthdate, ${formData.birthdate.toLocaleDateString()}`}
+                    style={styles.inputContainer}
+                    onPress={() => setShowDatePicker(true)}>
+                    <Calendar size={20} color={colors.textMuted} style={styles.inputIcon} />
+                    <Text style={styles.dateText}>
+                      {formData.birthdate.toLocaleDateString()}
+                    </Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={formData.birthdate}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={handleDateChange}
+                      maximumDate={new Date()}
+                    />
+                  )}
+                </>
+              )}
+              {errors.birthdate && (
+                <Text style={styles.errorText}>{errors.birthdate}</Text>
+              )}
+            </View>
+          </Card>
+
+          <Button
+            label="Create Account"
             onPress={handleSignUp}
-            disabled={loading}>
-            {loading ? (
-              <ActivityIndicator color={colors.text} />
-            ) : (
-              <>
-                <UserPlus size={20} color={colors.text} />
-                <Text style={styles.buttonText}>Create Account</Text>
-              </>
-            )}
-          </TouchableOpacity>
+            loading={loading}
+            disabled={loading}
+            icon={<UserPlus size={20} color={colors.onPrimary} />}
+            accessibilityLabel="Create account"
+            style={styles.submitButton}
+          />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account?</Text>
@@ -345,7 +334,7 @@ const styles = StyleSheet.create({
   header: {
     height: 200,
     justifyContent: 'flex-end',
-    padding: 20,
+    padding: spacing.lg,
   },
   headerImage: {
     ...StyleSheet.absoluteFill,
@@ -354,118 +343,92 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(3, 37, 57, 0.7)',
+    backgroundColor: colors.overlay,
   },
   title: {
-    fontSize: fontSizes[32],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: spacing.xxs,
   },
   subtitle: {
-    fontSize: fontSizes[18],
-    color: colors.text,
-    opacity: 0.9,
+    ...type.body,
+    color: colors.textMuted,
   },
   form: {
-    padding: 20,
+    padding: spacing.lg,
+  },
+  formCard: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
-    borderRadius: 12,
-    marginBottom: 12,
-    paddingHorizontal: 16,
-    height: 50,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    minHeight: 48,
+    gap: spacing.xs,
   },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    color: colors.background,
-    fontSize: fontSizes[16],
-  },
+  inputIcon: {},
   webDateInput: {
     flex: 1,
     borderWidth: 0,
     fontSize: fontSizes[16],
-    color: colors.background,
+    color: colors.text,
     fontFamily: 'inherit',
   },
   dateText: {
     flex: 1,
-    color: colors.background,
-    fontSize: fontSizes[16],
+    ...type.body,
+    color: colors.text,
   },
   errorText: {
-    color: colors.primary,
-    fontSize: fontSizes[12],
-    marginBottom: 12,
-    marginLeft: 4,
+    ...type.caption,
+    color: colors.danger,
+    marginTop: spacing.xxs,
+    marginLeft: spacing.xxs,
   },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
-    marginLeft: 8,
+  submitButton: {
+    marginTop: spacing.xxs,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: spacing.lg,
   },
   footerText: {
-    color: colors.text,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.textMuted,
   },
   footerLink: {
+    ...type.label,
     color: colors.primary,
-    fontSize: fontSizes[14],
-    fontWeight: '600',
-    marginLeft: 4,
   },
   confirmationContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
+  },
+  confirmationStamp: {
+    marginBottom: spacing.md,
   },
   confirmationTitle: {
-    fontSize: fontSizes[24],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.primary,
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   confirmationText: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   loginButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-  },
-  loginButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    marginTop: spacing.xs,
   },
 });

@@ -14,9 +14,10 @@ import { ArrowLeft, Share2 } from 'lucide-react-native';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { Modal, TextInput, FlatList } from 'react-native';
+import { Modal, FlatList } from 'react-native';
 import { Send } from 'lucide-react-native';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, fontFamily, fontSizes, type } from '@/src/presentation/theme/tokens';
+import { Card, Input, Stamp } from '@/src/presentation/components/ui';
 
 
 interface Book {
@@ -254,9 +255,7 @@ export default function BookDetails() {
 
           <View style={styles.priceContainer}>
             <Text style={styles.price}>${book.price.toFixed(2)}</Text>
-            <View style={styles.conditionBadge}>
-              <Text style={styles.conditionText}>{book.condition}</Text>
-            </View>
+            <Stamp tone="stamp">{book.condition.toUpperCase()}</Stamp>
           </View>
 
           <View style={styles.section}>
@@ -264,7 +263,7 @@ export default function BookDetails() {
             <Text style={styles.description}>{book.description}</Text>
           </View>
 
-          <View style={styles.detailsGrid}>
+          <Card style={styles.detailsGrid}>
             <View style={styles.detailItem}>
               <Text style={styles.detailLabel}>Language</Text>
               <Text style={styles.detailValue}>{book.language}</Text>
@@ -288,7 +287,7 @@ export default function BookDetails() {
                 </Text>
               </View>
             )}
-          </View>
+          </Card>
 
           {book.location && (
             <View style={styles.section}>
@@ -318,15 +317,12 @@ export default function BookDetails() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search friends..."
-                placeholderTextColor={colors.surface}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
+            <Input
+              style={styles.searchInput}
+              placeholder="Search friends..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
 
             {loadingFollowers ? (
               <View style={styles.loadingFollowers}>
@@ -425,38 +421,30 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: fontSizes[28],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
     marginBottom: 8,
   },
   author: {
-    fontSize: fontSizes[18],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
     marginBottom: 16,
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: fontSizes[20],
-    fontWeight: '600',
+    ...type.heading,
     color: colors.text,
     marginBottom: 12,
   },
   description: {
-    fontSize: fontSizes[16],
-    lineHeight: 24,
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
   },
   detailsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
     marginBottom: 24,
   },
   detailItem: {
@@ -466,15 +454,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   detailLabel: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: fontSizes[16],
+    ...type.label,
     color: colors.text,
-    fontWeight: '600',
   },
   categories: {
     flexDirection: 'row',
@@ -488,8 +474,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   categoryText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
   },
   footer: {
     flexDirection: 'row',
@@ -522,9 +508,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buttonText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
@@ -533,8 +518,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
+    ...type.body,
     marginTop: 12,
-    fontSize: fontSizes[16],
     color: colors.text,
   },
   errorContainer: {
@@ -545,19 +530,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   errorText: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.primary,
     marginBottom: 20,
     textAlign: 'center',
   },
   backButtonText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(3, 37, 57, 0.9)',
+    backgroundColor: colors.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -575,23 +559,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalTitle: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   closeButton: {
     padding: 4,
   },
-  searchContainer: {
-    backgroundColor: colors.text,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
   searchInput: {
-    height: 50,
-    color: colors.background,
-    fontSize: fontSizes[16],
+    marginBottom: 16,
   },
   followersList: {
     maxHeight: 400,
@@ -622,32 +597,30 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   followerName: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
     marginBottom: 2,
   },
   followerUsername: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
   },
   loadingFollowers: {
     padding: 20,
     alignItems: 'center',
   },
   loadingFollowersText: {
+    ...type.caption,
     color: colors.text,
     marginTop: 8,
-    fontSize: fontSizes[14],
   },
   emptyFollowers: {
     padding: 20,
     alignItems: 'center',
   },
   emptyFollowersText: {
+    ...type.body,
     color: colors.text,
-    fontSize: fontSizes[16],
     textAlign: 'center',
   },
   toast: {
@@ -664,14 +637,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.danger,
   },
   toastText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '500',
   },
   location: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -680,24 +651,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   price: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: fontSizes[24],
-    fontWeight: 'bold',
     color: colors.primary,
   },
-  conditionBadge: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  conditionText: {
-    color: colors.text,
-    fontSize: fontSizes[14],
-    fontWeight: '500',
-  },
   uploaderName: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
   },
 });

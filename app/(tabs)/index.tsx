@@ -30,8 +30,9 @@ import {
   spacing,
   touchTarget,
   type,
-  fontSizes,
+  fontFamily,
 } from '@/src/presentation/theme/tokens';
+import { Button, Stamp } from '@/src/presentation/components/ui';
 
 // ==========================
 // ✅ Type Declarations
@@ -147,9 +148,9 @@ export default function HomeScreen() {
         <Text style={styles.userBookTitle} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.userBookAuthor}>by {item.author}</Text>
         <Text style={styles.userBookPrice}>${item.price.toFixed(2)}</Text>
-        <View style={styles.userBookCondition}>
-          <Text style={styles.conditionText}>{item.condition}</Text>
-        </View>
+        <Stamp tone="bookplate" style={styles.userBookCondition}>
+          {item.condition}
+        </Stamp>
       </View>
     </TouchableOpacity>
   );
@@ -179,7 +180,7 @@ export default function HomeScreen() {
       {/* Search */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={21} color={colors.info} style={styles.searchIcon} />
+          <Search size={21} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Find readers by username"
@@ -197,14 +198,12 @@ export default function HomeScreen() {
       {localError && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{localError}</Text>
-          <TouchableOpacity
-            style={styles.retryButton}
+          <Button
+            label="Retry"
             onPress={() => loadData()}
-            accessibilityRole="button"
             accessibilityLabel="Retry loading books"
-          >
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
+            style={styles.retryButton}
+          />
         </View>
       )}
 
@@ -274,7 +273,7 @@ export default function HomeScreen() {
               </Text>
               <View style={styles.dailyBookMeta}>
                 <View style={styles.ratingContainer}>
-                  <Star size={16} color={colors.primary} fill={colors.primary} />
+                  <Star size={16} color={colors.foil} fill={colors.foil} />
                   <Text style={styles.ratingText}>
                     {dailyBook.volumeInfo.averageRating?.toFixed(1) || '4.8'}
                   </Text>
@@ -327,7 +326,7 @@ export default function HomeScreen() {
                   )}
                   <View style={styles.dailyBookMeta}>
                     <View style={styles.ratingContainer}>
-                      <Star size={16} color={colors.primary} fill={colors.primary} />
+                      <Star size={16} color={colors.foil} fill={colors.foil} />
                       <Text style={styles.ratingText}>
                         {item.volumeInfo.averageRating?.toFixed(1) || '4.5'}
                       </Text>
@@ -372,6 +371,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingHorizontal: spacing.md,
     minHeight: touchTarget.minHeight,
   },
@@ -387,6 +388,8 @@ const styles = StyleSheet.create({
     width: 164,
     backgroundColor: colors.surfaceRaised,
     borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginRight: spacing.sm,
     overflow: 'hidden',
   },
@@ -394,24 +397,26 @@ const styles = StyleSheet.create({
   userBookInfo: { padding: 12 },
   userBookTitle: { ...type.label, color: colors.text, marginBottom: 4 },
   userBookAuthor: { ...type.caption, color: colors.textMuted, marginBottom: 8 },
-  userBookPrice: { fontSize: fontSizes[18], lineHeight: 24, fontWeight: '700', color: colors.primary, marginBottom: 8 },
+  userBookPrice: { ...type.bodyStrong, color: colors.primary, marginBottom: 8 },
   userBookCondition: {
-    backgroundColor: colors.background,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
     alignSelf: 'flex-start',
   },
-  conditionText: { ...type.caption, color: colors.text, fontWeight: '600' },
-  dailyBookCard: { flexDirection: 'row', backgroundColor: colors.surfaceRaised, borderRadius: radius.md, overflow: 'hidden' },
+  dailyBookCard: {
+    flexDirection: 'row',
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
   dailyBookImage: { width: 120, height: 180 },
   dailyBookInfo: { flex: 1, padding: 16 },
-  dailyBookTitle: { fontSize: fontSizes[18], lineHeight: 24, fontWeight: '700', color: colors.text, marginBottom: 4 },
+  dailyBookTitle: { ...type.bodyStrong, color: colors.text, marginBottom: 4 },
   dailyBookAuthor: { ...type.caption, color: colors.textMuted, marginBottom: 8 },
   dailyBookDescription: { ...type.caption, color: colors.textMuted, marginBottom: 12 },
   dailyBookMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   ratingContainer: { flexDirection: 'row', alignItems: 'center' },
-  ratingText: { marginLeft: 4, ...type.caption, color: colors.text, fontWeight: '600' },
+  ratingText: { marginLeft: 4, ...type.caption, color: colors.text, fontFamily: fontFamily.bodyMedium },
   wishlistButton: {
     ...touchTarget,
     borderRadius: 24,
@@ -426,6 +431,8 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: colors.surfaceRaised,
     borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
   },
   errorText: { color: colors.text, ...type.body, textAlign: 'center', marginBottom: 12 },
@@ -443,11 +450,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: colors.primary,
-    minHeight: touchTarget.minHeight,
+    alignSelf: 'center',
     paddingHorizontal: 20,
-    justifyContent: 'center',
-    borderRadius: radius.sm,
   },
-  retryButtonText: { color: colors.onPrimary, ...type.label },
 });

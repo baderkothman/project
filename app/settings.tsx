@@ -22,7 +22,8 @@ import {
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type } from '@/src/presentation/theme/tokens';
+import { Button, Card, ScreenHeader } from '@/src/presentation/components/ui';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -118,7 +119,7 @@ export default function SettingsScreen() {
 
   const renderItem = (item: any) => {
     const Icon = item.icon;
-    
+
     return (
       <TouchableOpacity
         key={item.label}
@@ -172,41 +173,37 @@ export default function SettingsScreen() {
 
         {sections.map((section) => (
           <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={styles.sectionContent}>
+            <ScreenHeader title={section.title} />
+            <Card style={styles.sectionContent}>
               {section.items.map(renderItem)}
-            </View>
+            </Card>
           </View>
         ))}
 
         {!isGuest && (
-          <TouchableOpacity 
-            accessibilityRole="button"
-            accessibilityLabel="Sign out"
-            style={[styles.logoutButton, loading && styles.logoutButtonDisabled]}
+          <Button
+            label={loading ? 'Signing out...' : 'Sign Out'}
             onPress={handleLogout}
+            loading={loading}
             disabled={loading}
-          >
-            <LogOut size={24} color={colors.text} />
-            <Text style={styles.logoutText}>
-              {loading ? 'Signing out...' : 'Sign Out'}
-            </Text>
-          </TouchableOpacity>
+            variant="secondary"
+            icon={<LogOut size={20} color={colors.text} />}
+            accessibilityLabel="Sign out"
+            style={styles.logoutButton}
+          />
         )}
 
         {!isGuest && (
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="Delete account"
-            style={[styles.deleteButton, deleting && styles.logoutButtonDisabled]}
+          <Button
+            label={deleting ? 'Deleting account...' : 'Delete Account'}
             onPress={handleDeleteAccount}
+            loading={deleting}
             disabled={deleting}
-          >
-            <Trash2 size={24} color={colors.danger} />
-            <Text style={styles.deleteText}>
-              {deleting ? 'Deleting account...' : 'Delete Account'}
-            </Text>
-          </TouchableOpacity>
+            variant="ghost"
+            icon={<Trash2 size={20} color={colors.danger} />}
+            accessibilityLabel="Delete account"
+            style={styles.deleteButton}
+          />
         )}
       </ScrollView>
     </View>
@@ -222,12 +219,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -238,8 +235,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
@@ -249,27 +245,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
-    color: colors.primary,
-    marginBottom: 16,
-    textTransform: 'uppercase',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
   },
   sectionContent: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    padding: 0,
     overflow: 'hidden',
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.background,
+    borderBottomColor: colors.border,
   },
   itemDisabled: {
     opacity: 0.5,
@@ -279,9 +268,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemLabel: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
-    marginLeft: 12,
+    marginLeft: spacing.sm,
   },
   itemLabelDisabled: {
     color: colors.disabled,
@@ -290,59 +279,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  itemValue: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.8,
-    marginRight: 8,
-  },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.danger,
-    marginHorizontal: 20,
-    marginTop: 20,
-    padding: 16,
-    borderRadius: 12,
-  },
-  logoutButtonDisabled: {
-    opacity: 0.7,
-  },
-  logoutText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
-    marginLeft: 8,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
   },
   deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.sm,
+    marginBottom: Platform.OS === 'ios' ? 34 : spacing.lg,
     borderWidth: 1,
     borderColor: colors.danger,
-    marginHorizontal: 20,
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: Platform.OS === 'ios' ? 34 : 20,
-  },
-  deleteText: {
-    color: colors.danger,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
-    marginLeft: 8,
   },
   errorContainer: {
-    margin: 20,
-    padding: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 8,
+    margin: spacing.lg,
+    padding: spacing.md,
+    backgroundColor: colors.danger,
+    borderRadius: radius.sm,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
   },
 });

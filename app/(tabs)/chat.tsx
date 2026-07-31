@@ -15,7 +15,8 @@ import { Search, MessageSquare, UserPlus, UserMinus } from 'lucide-react-native'
 import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, touchTarget, type, fontFamily } from '@/src/presentation/theme/tokens';
+import { EmptyState } from '@/src/presentation/components/ui';
 
 interface ChatPreview {
   id: string;
@@ -107,7 +108,7 @@ export default function ChatScreen() {
           const newMessage = payload.new;
           setChats(currentChats => {
             const updatedChats = [...currentChats];
-            const chatIndex = updatedChats.findIndex(chat => 
+            const chatIndex = updatedChats.findIndex(chat =>
               chat.other_user_id === (newMessage.sender_id === session?.user?.id ? newMessage.recipient_id : newMessage.sender_id)
             );
 
@@ -157,9 +158,9 @@ export default function ChatScreen() {
 
       if (error) throw error;
 
-      setChats(currentChats => 
-        currentChats.map(chat => 
-          chat.other_user_id === senderId 
+      setChats(currentChats =>
+        currentChats.map(chat =>
+          chat.other_user_id === senderId
             ? { ...chat, unread_count: 0 }
             : chat
         )
@@ -216,7 +217,7 @@ export default function ChatScreen() {
   const toggleFollow = async (userId: string) => {
     try {
       setFollowLoading(prev => ({ ...prev, [userId]: true }));
-      
+
       const isFollowing = searchResults.find(r => r.id === userId)?.is_following;
 
       if (isFollowing) {
@@ -298,7 +299,7 @@ export default function ChatScreen() {
           <Text style={styles.searchUsername}>@{item.username}</Text>
         </View>
       </TouchableOpacity>
-      
+
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={[
@@ -313,15 +314,15 @@ export default function ChatScreen() {
           accessibilityState={{ selected: item.is_following, disabled: followLoading[item.id] }}
         >
           {followLoading[item.id] ? (
-            <ActivityIndicator size="small" color={colors.text} />
+            <ActivityIndicator size="small" color={item.is_following ? colors.text : colors.onPrimary} />
           ) : (
             <>
               {item.is_following ? (
                 <UserMinus size={16} color={colors.text} />
               ) : (
-                <UserPlus size={16} color={colors.text} />
+                <UserPlus size={16} color={colors.onPrimary} />
               )}
-              <Text style={styles.followButtonText}>
+              <Text style={[styles.followButtonText, item.is_following && styles.followingButtonText]}>
                 {item.is_following ? 'Following' : 'Follow'}
               </Text>
             </>
@@ -359,7 +360,7 @@ export default function ChatScreen() {
             </Text>
           </View>
           <View style={styles.messagePreview}>
-            <Text 
+            <Text
               style={[
                 styles.messageText,
                 item.unread_count > 0 && styles.unreadMessage
@@ -392,11 +393,11 @@ export default function ChatScreen() {
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color={colors.surface} style={styles.searchIcon} />
+          <Search size={20} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search users to message..."
-            placeholderTextColor={colors.surface}
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -428,12 +429,10 @@ export default function ChatScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.chatList}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No messages yet</Text>
-              <Text style={styles.emptySubtext}>
-                Search for users above to start a conversation
-              </Text>
-            </View>
+            <EmptyState
+              title="No messages yet"
+              description="Search for users above to start a conversation"
+            />
           }
         />
       )}
@@ -451,34 +450,34 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingHorizontal: 16,
-    height: 50,
+    height: touchTarget.minHeight,
   },
   searchIcon: {
     marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    fontSize: fontSizes[16],
-    color: colors.background,
+    ...type.body,
+    color: colors.text,
   },
   title: {
-    fontSize: fontSizes[32],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
     paddingHorizontal: 20,
   },
   subtitle: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
     paddingHorizontal: 20,
     marginTop: 4,
     marginBottom: 20,
@@ -489,9 +488,11 @@ const styles = StyleSheet.create({
   searchResult: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: 12,
-    borderRadius: 12,
+    borderRadius: radius.md,
     marginBottom: 8,
   },
   searchAvatar: {
@@ -506,14 +507,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchName: {
-    fontSize: fontSizes[16],
+    ...type.label,
     color: colors.text,
-    fontWeight: '500',
   },
   searchUsername: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
   },
   chatList: {
     padding: 16,
@@ -522,8 +521,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 12,
     marginBottom: 8,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
   avatar: {
@@ -544,14 +545,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   userName: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
   },
   messageTime: {
-    fontSize: fontSizes[12],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
   },
   messagePreview: {
     flexDirection: 'row',
@@ -559,16 +558,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   messageText: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
     flex: 1,
     marginRight: 8,
   },
   unreadMessage: {
     color: colors.text,
-    fontWeight: '500',
-    opacity: 1,
+    fontFamily: fontFamily.bodyMedium,
   },
   unreadBadge: {
     backgroundColor: colors.primary,
@@ -580,9 +577,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   unreadCount: {
-    color: colors.background,
-    fontSize: fontSizes[12],
-    fontWeight: 'bold',
+    color: colors.onPrimary,
+    ...type.caption,
+    fontFamily: fontFamily.bodyBold,
   },
   loadingContainer: {
     flex: 1,
@@ -592,18 +589,20 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
   },
   errorContainer: {
     padding: 16,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.danger,
     margin: 16,
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    color: colors.danger,
+    ...type.caption,
     textAlign: 'center',
   },
   emptyContainer: {
@@ -611,14 +610,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.7,
+    ...type.caption,
+    color: colors.textMuted,
     textAlign: 'center',
     marginTop: 8,
   },
@@ -633,24 +631,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: radius.pill,
     gap: 4,
   },
   followingButton: {
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.border,
   },
   followButtonText: {
+    color: colors.onPrimary,
+    ...type.caption,
+    fontFamily: fontFamily.bodyMedium,
+  },
+  followingButtonText: {
     color: colors.text,
-    fontSize: fontSizes[14],
-    fontWeight: '500',
   },
   messageButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },

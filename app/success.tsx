@@ -1,26 +1,28 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, type } from '@/src/presentation/theme/tokens';
+import { Button, Card, Stamp } from '@/src/presentation/components/ui';
 
 export default function SuccessScreen() {
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <Card style={styles.content}>
         <View style={styles.iconContainer}>
-          <Check size={48} color={colors.text} />
+          <Check size={48} color={colors.onPrimary} />
         </View>
         <Text style={styles.title}>Payment Successful!</Text>
+        <View style={styles.stampWrap}>
+          <Stamp tone="bookplate">Confirmed</Stamp>
+        </View>
         <Text style={styles.message}>
           Thank you for your purchase. Your payment has been processed successfully.
         </Text>
         <Link href="/(tabs)" asChild>
-          <TouchableOpacity style={styles.button} accessibilityRole="button" accessibilityLabel="Return to home">
-            <Text style={styles.buttonText}>Return to Home</Text>
-          </TouchableOpacity>
+          <Button label="Return to Home" onPress={() => {}} accessibilityLabel="Return to home" />
         </Link>
-      </View>
+      </Card>
     </View>
   );
 }
@@ -31,15 +33,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   content: {
-    backgroundColor: colors.surface,
-    padding: 32,
-    borderRadius: 16,
     alignItems: 'center',
     width: '100%',
     maxWidth: 400,
+    padding: spacing.xl,
   },
   iconContainer: {
     width: 80,
@@ -48,31 +48,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   title: {
-    fontSize: fontSizes[24],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
-    marginBottom: 16,
+    marginBottom: spacing.sm,
     textAlign: 'center',
+  },
+  stampWrap: {
+    marginBottom: spacing.md,
   },
   message: {
-    fontSize: fontSizes[16],
-    color: colors.text,
+    ...type.body,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginBottom: 32,
-    opacity: 0.8,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    marginBottom: spacing.xl,
   },
 });

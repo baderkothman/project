@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,8 @@ import { getGoogleBook } from '@/src/application/services/google-books';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import { useCallback } from 'react';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type } from '@/src/presentation/theme/tokens';
+import { Button, EmptyState } from '@/src/presentation/components/ui';
 
 interface Book {
   id: string;
@@ -102,11 +103,11 @@ export default function WishlistScreen() {
       // Combine and sort by created_at
       const allBooks = [...localBooks, ...googleBooks].sort((a, b) => {
         const aDate = wishlistItems.find((item) =>
-          item.book_id === (a as Book).id || 
+          item.book_id === (a as Book).id ||
           item.google_books_id === (a as GoogleBook).id
         )?.created_at || '';
         const bDate = wishlistItems.find((item) =>
-          item.book_id === (b as Book).id || 
+          item.book_id === (b as Book).id ||
           item.google_books_id === (b as GoogleBook).id
         )?.created_at || '';
         return new Date(bDate).getTime() - new Date(aDate).getTime();
@@ -149,9 +150,9 @@ export default function WishlistScreen() {
 
       if (deleteError) throw deleteError;
 
-      setBooks(books.filter(book => 
-        isGoogleBook ? 
-          (book as GoogleBook).id !== bookId : 
+      setBooks(books.filter(book =>
+        isGoogleBook ?
+          (book as GoogleBook).id !== bookId :
           (book as Book).id !== bookId
       ));
     } catch (err) {
@@ -166,8 +167,8 @@ export default function WishlistScreen() {
   const renderBook = ({ item }: { item: Book | GoogleBook }) => {
     const isGoogleBook = 'volumeInfo' in item;
     const title = isGoogleBook ? item.volumeInfo.title : item.title;
-    const author = isGoogleBook ? 
-      (item.volumeInfo.authors?.[0] || 'Unknown Author') : 
+    const author = isGoogleBook ?
+      (item.volumeInfo.authors?.[0] || 'Unknown Author') :
       item.author;
     const imageUrl = isGoogleBook ?
       item.volumeInfo.imageLinks?.thumbnail :
@@ -200,7 +201,7 @@ export default function WishlistScreen() {
           accessibilityRole="button"
           accessibilityLabel={`Remove ${title} from wishlist`}
         >
-          <Trash2 size={20} color={colors.text} />
+          <Trash2 size={20} color={colors.onDark} />
         </TouchableOpacity>
       </View>
     );
@@ -227,7 +228,7 @@ export default function WishlistScreen() {
 
       {error && (
         <View style={[styles.errorContainer, error.isNetwork && styles.networkErrorContainer]}>
-          {error.isNetwork && <WifiOff size={24} color={colors.background} style={styles.errorIcon} />}
+          {error.isNetwork && <WifiOff size={24} color={colors.onDark} style={styles.errorIcon} />}
           <Text style={styles.errorText}>{error.message}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={fetchWishlistBooks} accessibilityRole="button" accessibilityLabel="Try again">
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -242,18 +243,16 @@ export default function WishlistScreen() {
         contentContainerStyle={styles.booksList}
         ListEmptyComponent={
           !error ? (
-            <View style={styles.emptyContainer}>
-              <Heart size={48} color={colors.primary} />
-              <Text style={styles.emptyText}>Your wishlist is empty</Text>
-              <Text style={styles.emptySubtext}>
-                Add books you love to your wishlist
-              </Text>
-              <Link href="/(tabs)/browse" asChild>
-                <TouchableOpacity style={styles.browseButton} accessibilityRole="button" accessibilityLabel="Browse books">
-                  <Text style={styles.browseButtonText}>Browse Books</Text>
-                </TouchableOpacity>
-              </Link>
-            </View>
+            <EmptyState
+              icon={<Heart size={48} color={colors.primary} />}
+              title="Your wishlist is empty"
+              description="Add books you love to your wishlist"
+              action={
+                <Link href="/(tabs)/browse" asChild>
+                  <Button label="Browse Books" onPress={() => {}} accessibilityLabel="Browse books" style={styles.browseButton} />
+                </Link>
+              }
+            />
           ) : null
         }
       />
@@ -270,12 +269,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -286,21 +285,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pageTitle: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
     width: 40,
   },
   booksList: {
-    padding: 16,
+    padding: spacing.md,
   },
   bookCard: {
     position: 'relative',
-    borderRadius: 12,
-    marginBottom: 16,
+    borderRadius: radius.md,
+    marginBottom: spacing.md,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   bookContentArea: {
     flexDirection: 'row',
@@ -312,29 +312,26 @@ const styles = StyleSheet.create({
   },
   bookInfo: {
     flex: 1,
-    padding: 16,
+    padding: spacing.md,
   },
   bookTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: 'bold',
+    ...type.bodyStrong,
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   bookAuthor: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.8,
-    marginBottom: 8,
+    ...type.caption,
+    color: colors.textMuted,
+    marginBottom: spacing.xs,
   },
   bookPrice: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
-    color: colors.primary,
+    ...type.heading,
+    color: colors.foil,
   },
   removeButton: {
     position: 'absolute',
-    bottom: 16,
-    right: 16,
+    bottom: spacing.md,
+    right: spacing.md,
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -346,17 +343,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: colors.background,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: fontSizes[16],
+    marginTop: spacing.sm,
+    ...type.body,
     color: colors.text,
   },
   errorContainer: {
-    padding: 16,
-    backgroundColor: colors.primary,
-    margin: 16,
-    borderRadius: 8,
+    padding: spacing.md,
+    backgroundColor: colors.danger,
+    margin: spacing.md,
+    borderRadius: radius.sm,
     alignItems: 'center',
   },
   networkErrorContainer: {
@@ -365,54 +363,25 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   errorIcon: {
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   retryButton: {
     backgroundColor: colors.background,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
   },
   retryButtonText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-  },
-  emptyText: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
-    color: colors.text,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
-    marginBottom: 24,
-    textAlign: 'center',
   },
   browseButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-  },
-  browseButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    marginTop: spacing.xs,
   },
 });

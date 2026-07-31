@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Copy, X } from 'lucide-react-native';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type } from '@/src/presentation/theme/tokens';
 
 interface ShareModalProps {
   visible: boolean;
@@ -147,7 +147,7 @@ export default function ShareModal({ visible, onClose, url }: ShareModalProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(3, 37, 57, 0.9)',
+    backgroundColor: colors.overlay,
     justifyContent: 'flex-end',
   },
   overlayTouch: {
@@ -156,44 +156,46 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderBottomWidth: 0,
+    padding: spacing.lg,
+    paddingBottom: Platform.OS === 'ios' ? 40 : spacing.lg,
     maxHeight: '80%',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   closeButton: {
-    padding: 4,
+    padding: spacing.xxs,
   },
   urlContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.background,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
+    borderRadius: radius.md,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
   },
   url: {
     flex: 1,
     color: colors.text,
-    fontSize: fontSizes[16],
-    marginRight: 12,
+    ...type.body,
+    marginRight: spacing.sm,
   },
   copyButton: {
-    padding: 8,
-    backgroundColor: colors.surface,
-    borderRadius: 8,
+    padding: spacing.xs,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.sm,
   },
   shareButton: {
     flexDirection: 'row',
@@ -206,22 +208,21 @@ const styles = StyleSheet.create({
   },
   shareButtonText: {
     color: colors.text,
-    fontSize: fontSizes[16],
+    fontSize: 16,
     fontWeight: '600',
   },
   toast: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 100 : 80,
-    left: 20,
-    right: 20,
+    left: spacing.lg,
+    right: spacing.lg,
     backgroundColor: colors.available,
-    padding: 16,
-    borderRadius: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
   toastText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '500',
+    color: colors.onDark,
+    ...type.body,
   },
 });

@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { CreditCard, Check, ArrowLeft } from 'lucide-react-native';
 import { useStripe } from '@/src/presentation/hooks/useStripe';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, spacing, type } from '@/src/presentation/theme/tokens';
+import { Button, Card } from '@/src/presentation/components/ui';
 
 export const STRIPE_PRODUCTS = {
   plan2_monthly: {
@@ -32,7 +33,7 @@ export default function SubscriptionScreen() {
       plan2_quarterly: "plan2",
       plan3: "plan3",
   };
-  
+
   const handleSubscribe = async (planId: keyof typeof STRIPE_PRODUCTS) => {
       await subscribe(PLAN_ID_MAP[planId]);
   };
@@ -86,7 +87,7 @@ export default function SubscriptionScreen() {
         <Text style={styles.subheader}>Select the plan that best fits your needs</Text>
 
         {Object.entries(STRIPE_PRODUCTS).map(([planId, plan]) => (
-          <View key={planId} style={styles.planCard}>
+          <Card key={planId} style={styles.planCard}>
             <View style={styles.planHeader}>
               <CreditCard size={32} color={colors.primary} />
               <Text style={styles.planName}>{plan.name}</Text>
@@ -101,19 +102,13 @@ export default function SubscriptionScreen() {
               {renderPlanFeatures()}
             </View>
 
-            <TouchableOpacity
-              style={[styles.subscribeButton, loading && styles.buttonDisabled]}
+            <Button
+              label={loading ? 'Processing...' : 'Subscribe Now'}
               onPress={() => handleSubscribe(planId as keyof typeof STRIPE_PRODUCTS)}
               disabled={loading}
-              accessibilityRole="button"
               accessibilityLabel={`Subscribe to ${plan.name}`}
-              accessibilityState={{ disabled: loading }}
-            >
-              <Text style={styles.subscribeButtonText}>
-                {loading ? 'Processing...' : 'Subscribe Now'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+            />
+          </Card>
         ))}
       </ScrollView>
     </View>
@@ -129,12 +124,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -145,86 +140,64 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
     width: 40,
   },
   content: {
-    padding: 20,
+    padding: spacing.lg,
   },
   sectionHeader: {
-    fontSize: fontSizes[28],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   subheader: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   planCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
+    padding: spacing.lg,
   },
   planHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 12,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
   },
   planName: {
-    fontSize: fontSizes[24],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   planPrice: {
-    fontSize: fontSizes[48],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.primary,
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   perPeriod: {
-    fontSize: fontSizes[16],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.body,
+    color: colors.textMuted,
   },
   features: {
-    marginBottom: 32,
-    gap: 16,
+    marginBottom: spacing.xl,
+    gap: spacing.md,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.sm,
   },
   featureText: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
-  },
-  subscribeButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  subscribeButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[18],
-    fontWeight: '600',
   },
 });

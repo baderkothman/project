@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, ImageSourcePropType } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { ArrowLeft, BookOpen, Users, Sparkles, Heart } from 'lucide-react-native';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type } from '@/src/presentation/theme/tokens';
+import { Card } from '@/src/presentation/components/ui';
 
 interface TeamMember {
   name: string;
@@ -71,7 +72,7 @@ export default function AboutScreen() {
           />
           <View style={styles.heroOverlay} />
           <View style={styles.heroContent}>
-            <BookOpen size={48} color={colors.primary} />
+            <BookOpen size={48} color={colors.foil} />
             <Text style={styles.heroTitle}>Connecting Readers Worldwide</Text>
             <Text style={styles.heroSubtitle}>Share stories, discover books, build community</Text>
           </View>
@@ -96,30 +97,30 @@ export default function AboutScreen() {
             <Text style={styles.sectionTitle}>What We Offer</Text>
           </View>
           <View style={styles.features}>
-            <View style={styles.featureCard}>
+            <Card style={styles.featureCard}>
               <Text style={styles.featureTitle}>Vast Library</Text>
               <Text style={styles.featureText}>
                 Access millions of books through Google Books API, from classics to latest releases.
               </Text>
-            </View>
-            <View style={styles.featureCard}>
+            </Card>
+            <Card style={styles.featureCard}>
               <Text style={styles.featureTitle}>Book Exchange</Text>
               <Text style={styles.featureText}>
                 List and discover physical books in your area, building local reading communities.
               </Text>
-            </View>
-            <View style={styles.featureCard}>
+            </Card>
+            <Card style={styles.featureCard}>
               <Text style={styles.featureTitle}>Smart Features</Text>
               <Text style={styles.featureText}>
                 Track your reading, create wishlists, and get personalized recommendations.
               </Text>
-            </View>
-            <View style={styles.featureCard}>
+            </Card>
+            <Card style={styles.featureCard}>
               <Text style={styles.featureTitle}>Reader Community</Text>
               <Text style={styles.featureText}>
                 Connect with other readers, share recommendations, and discuss your favorite books.
               </Text>
-            </View>
+            </Card>
           </View>
         </View>
 
@@ -143,14 +144,14 @@ export default function AboutScreen() {
           </View>
           <View style={styles.teamGrid}>
             {TEAM_MEMBERS.map((member, index) => (
-              <View key={index} style={styles.teamCard}>
+              <Card key={index} style={styles.teamCard}>
                 <Image
                   source={member.image}
                   style={styles.teamMemberImage}
                 />
                 <Text style={styles.teamMemberName}>{member.name}</Text>
                 <Text style={styles.teamMemberRole}>{member.role}</Text>
-              </View>
+              </Card>
             ))}
           </View>
         </View>
@@ -168,12 +169,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -184,8 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   placeholder: {
@@ -204,102 +204,88 @@ const styles = StyleSheet.create({
   },
   heroOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(3, 37, 57, 0.7)',
+    backgroundColor: colors.overlay,
   },
   heroContent: {
     ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   heroTitle: {
-    fontSize: fontSizes[32],
-    fontWeight: 'bold',
+    ...type.title,
     color: colors.text,
     textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
   },
   heroSubtitle: {
-    fontSize: fontSizes[18],
+    ...type.body,
     color: colors.text,
     textAlign: 'center',
-    opacity: 0.9,
   },
   section: {
-    padding: 24,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 12,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
   },
   sectionTitle: {
-    fontSize: fontSizes[24],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   sectionText: {
-    fontSize: fontSizes[16],
-    lineHeight: 24,
-    color: colors.text,
-    opacity: 0.9,
-    marginBottom: 16,
+    ...type.body,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
   },
   features: {
-    gap: 16,
+    gap: spacing.md,
   },
   featureCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 20,
+    padding: spacing.lg,
   },
   featureTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.bodyStrong,
     color: colors.primary,
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   featureText: {
-    fontSize: fontSizes[14],
-    lineHeight: 20,
-    color: colors.text,
-    opacity: 0.9,
+    ...type.caption,
+    color: colors.textMuted,
   },
   teamGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: spacing.md,
     justifyContent: 'space-between',
   },
   teamCard: {
     width: '47%',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
     alignItems: 'center',
   },
   teamMemberImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginBottom: 12,
+    marginBottom: spacing.sm,
     borderWidth: 3,
     borderColor: colors.primary,
   },
   teamMemberName: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
     textAlign: 'center',
   },
   teamMemberRole: {
-    fontSize: fontSizes[14],
-    color: colors.primary,
+    ...type.caption,
+    color: colors.foil,
     textAlign: 'center',
   },
 });

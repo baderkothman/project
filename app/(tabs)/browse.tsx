@@ -34,7 +34,8 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import { searchGoogleBooks } from '@/src/application/services/google-books';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, touchTarget, type, fontFamily } from '@/src/presentation/theme/tokens';
+import { Button } from '@/src/presentation/components/ui';
 
 interface Book {
   id: string;
@@ -407,7 +408,7 @@ export default function BrowseScreen() {
     if (searchHistory.length === 0) {
       return (
         <View style={styles.emptyHistory}>
-          <History size={24} color={colors.surface} />
+          <History size={24} color={colors.textMuted} />
           <Text style={styles.emptyHistoryText}>You haven't searched for anything yet</Text>
         </View>
       );
@@ -430,7 +431,7 @@ export default function BrowseScreen() {
               accessibilityRole="button"
               accessibilityLabel={`Search for ${term}`}
             >
-              <History size={16} color={colors.surface} />
+              <History size={16} color={colors.textMuted} />
               <Text style={styles.historyText}>{term}</Text>
             </TouchableOpacity>
           ))}
@@ -486,7 +487,7 @@ export default function BrowseScreen() {
           )}
           <View style={styles.bookMeta}>
             <View style={styles.ratingContainer}>
-              <Star size={16} color={colors.primary} fill={colors.primary} />
+              <Star size={16} color={colors.foil} fill={colors.foil} />
               <Text style={styles.ratingText}>
                 {item.volumeInfo.averageRating?.toFixed(1) || '4.5'}
               </Text>
@@ -652,17 +653,15 @@ export default function BrowseScreen() {
         </View>
       </ScrollView>
 
-      <TouchableOpacity
-        style={styles.applyButton}
+      <Button
+        label="Apply Filters"
         onPress={() => {
           setShowFilters(false);
           searchBooks();
         }}
-        accessibilityRole="button"
         accessibilityLabel="Apply filters"
-      >
-        <Text style={styles.applyButtonText}>Apply Filters</Text>
-      </TouchableOpacity>
+        style={styles.applyButton}
+      />
     </View>
   );
 
@@ -670,11 +669,11 @@ export default function BrowseScreen() {
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color={colors.surface} style={styles.searchIcon} />
+          <Search size={20} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search books..."
-            placeholderTextColor={colors.surface}
+            placeholderTextColor={colors.textMuted}
             value={query}
             onChangeText={handleQueryChange}
             onSubmitEditing={() => searchBooks()}
@@ -691,7 +690,7 @@ export default function BrowseScreen() {
               accessibilityRole="button"
               accessibilityLabel="Clear search"
             >
-              <X size={20} color={colors.surface} />
+              <X size={20} color={colors.textMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -715,7 +714,7 @@ export default function BrowseScreen() {
             accessibilityRole="button"
             accessibilityLabel="Search"
           >
-            <BookOpen size={20} color={colors.text} />
+            <BookOpen size={20} color={colors.onPrimary} />
             <Text style={styles.searchButtonText}>Search</Text>
           </TouchableOpacity>
         </View>
@@ -726,14 +725,12 @@ export default function BrowseScreen() {
       {error && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity
-            style={styles.retryButton}
+          <Button
+            label="Retry Search"
             onPress={() => searchBooks()}
-            accessibilityRole="button"
             accessibilityLabel="Retry search"
-          >
-            <Text style={styles.retryButtonText}>Retry Search</Text>
-          </TouchableOpacity>
+            style={styles.retryButton}
+          />
         </View>
       )}
 
@@ -786,24 +783,26 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingHorizontal: 16,
     marginBottom: 16,
-    height: 50,
+    height: touchTarget.minHeight,
   },
   searchIcon: {
     marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    fontSize: fontSizes[16],
-    color: colors.background,
+    ...type.body,
+    color: colors.text,
   },
   searchActions: {
     flexDirection: 'row',
@@ -815,13 +814,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
-    borderRadius: 12,
+    borderRadius: radius.md,
     height: 46,
   },
   searchButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
+    color: colors.onPrimary,
     marginLeft: 8,
   },
   filterButton: {
@@ -830,22 +828,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     height: 46,
     gap: 4,
   },
   filterButtonActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceRaised,
+    borderColor: colors.primary,
   },
   filterButtonText: {
+    ...type.label,
     color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
   },
   filtersContainer: {
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
+    borderBottomColor: colors.border,
     maxHeight: 500,
   },
   filtersHidden: {
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
+    borderBottomColor: colors.border,
   },
   filterHeaderActions: {
     flexDirection: 'row',
@@ -865,8 +865,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   filterTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.heading,
     color: colors.text,
   },
   clearButton: {
@@ -876,8 +875,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   clearButtonText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
   },
   closeButton: {
     padding: 4,
@@ -889,8 +888,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   filterSectionTitle: {
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    ...type.label,
     color: colors.text,
     marginBottom: 12,
   },
@@ -902,20 +900,21 @@ const styles = StyleSheet.create({
   filterOption: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: radius.pill,
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.border,
   },
   filterOptionActive: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   filterOptionText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
   },
   filterOptionTextActive: {
-    color: colors.background,
+    color: colors.onPrimary,
   },
   sortOptions: {
     gap: 8,
@@ -923,44 +922,35 @@ const styles = StyleSheet.create({
   sortOption: {
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.border,
     marginBottom: 8,
   },
   sortOptionActive: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   sortOptionText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
   },
   sortOptionTextActive: {
-    color: colors.background,
+    color: colors.onPrimary,
   },
   applyButton: {
-    backgroundColor: colors.primary,
-    padding: 20,
-    alignItems: 'center',
-  },
-  applyButtonText: {
-    color: colors.text,
-    fontSize: fontSizes[16],
-    fontWeight: '600',
+    margin: spacing.md,
   },
   booksList: {
     padding: 20,
   },
   bookCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   bookContent: {
     flexDirection: 'row',
@@ -969,22 +959,21 @@ const styles = StyleSheet.create({
   bookImage: {
     width: 100,
     height: 150,
-    borderRadius: 8,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surface,
   },
   bookInfo: {
     flex: 1,
     marginLeft: 16,
   },
   bookTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.bodyStrong,
     color: colors.text,
     marginBottom: 4,
   },
   bookAuthor: {
-    fontSize: fontSizes[14],
-    color: colors.text,
-    opacity: 0.8,
+    ...type.caption,
+    color: colors.textMuted,
     marginBottom: 12,
   },
   bookMeta: {
@@ -999,13 +988,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ratingText: {
+    ...type.caption,
     color: colors.text,
-    fontSize: fontSizes[14],
-    fontWeight: '500',
+    fontFamily: fontFamily.bodyMedium,
   },
   previewContainer: {
     borderTopWidth: 1,
-    borderTopColor: colors.primary,
+    borderTopColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -1023,9 +1012,9 @@ const styles = StyleSheet.create({
   },
   previewButtonText: {
     marginLeft: 8,
-    fontSize: fontSizes[14],
+    ...type.caption,
     color: colors.text,
-    fontWeight: '500',
+    fontFamily: fontFamily.bodyMedium,
   },
   wishlistButton: {
     width: 32,
@@ -1042,30 +1031,26 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
   },
   errorContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
   },
   errorText: {
+    ...type.body,
     color: colors.text,
     textAlign: 'center',
     marginBottom: 12,
   },
   retryButton: {
-    backgroundColor: colors.primary,
     paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: colors.text,
-    fontWeight: '600',
   },
   emptyContainer: {
     flex: 1,
@@ -1080,13 +1065,14 @@ const styles = StyleSheet.create({
   },
   historyContainer: {
     padding: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 24,
   },
   historyTitle: {
-    fontSize: fontSizes[18],
-    fontWeight: '600',
+    ...type.bodyStrong,
     color: colors.text,
     marginBottom: 12,
   },
@@ -1096,15 +1082,17 @@ const styles = StyleSheet.create({
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.text,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     gap: 8,
   },
   historyText: {
     flex: 1,
-    fontSize: fontSizes[14],
-    color: colors.background,
+    ...type.caption,
+    color: colors.text,
   },
   viewAllButton: {
     flexDirection: 'row',
@@ -1115,20 +1103,22 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     color: colors.primary,
-    fontSize: fontSizes[14],
-    fontWeight: '500',
+    ...type.caption,
+    fontFamily: fontFamily.bodyMedium,
     marginRight: 4,
   },
   emptyHistory: {
     alignItems: 'center',
     padding: 24,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 24,
   },
   emptyHistoryText: {
     color: colors.text,
-    fontSize: fontSizes[16],
+    ...type.body,
     marginTop: 12,
     textAlign: 'center',
   },
@@ -1137,30 +1127,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: 24,
     gap: 8,
   },
   historyLoadingText: {
     color: colors.text,
-    fontSize: fontSizes[14],
+    ...type.caption,
   },
   emptyText: {
-    fontSize: fontSizes[16],
+    ...type.body,
     color: colors.text,
     textAlign: 'center',
   },
   clearHistoryButton: {
     backgroundColor: colors.primary,
     padding: 10,
-    borderRadius: 6,
+    borderRadius: radius.sm,
     marginTop: 12,
     alignItems: 'center',
   },
   clearHistoryButtonText: {
-    color: colors.text,
-    fontWeight: 'bold',
+    color: colors.onPrimary,
+    ...type.label,
   },
   noHistory: {
     color: colors.text,

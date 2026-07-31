@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 import { colors, radius, spacing, touchTarget, type } from '@/src/presentation/theme/tokens';
 

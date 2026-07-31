@@ -1,3 +1,4 @@
+import React from 'react';
 import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { colors, radius, spacing, stamp, type } from '@/src/presentation/theme/tokens';
 

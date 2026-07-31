@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Image,
@@ -17,7 +16,8 @@ import { dataClient } from '@/src/infrastructure/local-api/client';
 import { useAuth } from '@/src/presentation/providers/AuthProvider';
 import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
-import { colors, fontSizes } from '@/src/presentation/theme/tokens';
+import { colors, radius, spacing, type } from '@/src/presentation/theme/tokens';
+import { Input } from '@/src/presentation/components/ui';
 
 interface Profile {
   username: string;
@@ -215,9 +215,9 @@ export default function EditProfileScreen() {
           accessibilityState={{ disabled: saving }}
         >
           {saving ? (
-            <RefreshCw size={24} color={colors.text} style={styles.spinningIcon} />
+            <RefreshCw size={24} color={colors.onPrimary} style={styles.spinningIcon} />
           ) : (
-            <Save size={24} color={colors.text} />
+            <Save size={24} color={colors.onPrimary} />
           )}
         </TouchableOpacity>
       </View>
@@ -232,8 +232,8 @@ export default function EditProfileScreen() {
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <Image
-              source={{ 
-                uri: profile?.avatar_url || 
+              source={{
+                uri: profile?.avatar_url ||
                   'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=400&q=80'
               }}
               style={styles.avatar}
@@ -245,53 +245,42 @@ export default function EditProfileScreen() {
               accessibilityRole="button"
               accessibilityLabel="Change profile photo"
             >
-              <Camera size={20} color={colors.text} />
+              <Camera size={20} color={colors.onPrimary} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <User size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="First Name"
-              placeholderTextColor={colors.surface}
-              value={profile?.first_name}
-              onChangeText={(text) => 
-                setProfile(prev => prev ? { ...prev, first_name: text } : null)
-              }
-            />
-          </View>
+          <Input
+            icon={<User size={20} color={colors.textMuted} />}
+            placeholder="First Name"
+            value={profile?.first_name}
+            onChangeText={(text) =>
+              setProfile(prev => prev ? { ...prev, first_name: text } : null)
+            }
+          />
 
-          <View style={styles.inputContainer}>
-            <User size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Last Name"
-              placeholderTextColor={colors.surface}
-              value={profile?.last_name}
-              onChangeText={(text) => 
-                setProfile(prev => prev ? { ...prev, last_name: text } : null)
-              }
-            />
-          </View>
+          <Input
+            icon={<User size={20} color={colors.textMuted} />}
+            placeholder="Last Name"
+            value={profile?.last_name}
+            onChangeText={(text) =>
+              setProfile(prev => prev ? { ...prev, last_name: text } : null)
+            }
+          />
 
-          <View style={[styles.inputContainer, styles.bioContainer]}>
-            <FileText size={20} color={colors.surface} style={styles.inputIcon} />
-            <TextInput
-              style={[styles.input, styles.bioInput]}
-              placeholder="Write something about yourself..."
-              placeholderTextColor={colors.surface}
-              value={profile?.bio || ''}
-              onChangeText={(text) => 
-                setProfile(prev => prev ? { ...prev, bio: text } : null)
-              }
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-          </View>
+          <Input
+            icon={<FileText size={20} color={colors.textMuted} style={styles.bioIcon} />}
+            placeholder="Write something about yourself..."
+            value={profile?.bio || ''}
+            onChangeText={(text) =>
+              setProfile(prev => prev ? { ...prev, bio: text } : null)
+            }
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+            style={styles.bioInput}
+          />
         </View>
       </ScrollView>
     </View>
@@ -307,12 +296,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: Platform.OS === 'ios' ? 60 : Platform.OS === 'android' ? 40 : 20,
-    paddingBottom: 16,
+    paddingBottom: spacing.md,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   backButton: {
     width: 40,
@@ -323,8 +312,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: fontSizes[20],
-    fontWeight: 'bold',
+    ...type.heading,
     color: colors.text,
   },
   saveButton: {
@@ -345,19 +333,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   errorContainer: {
-    margin: 20,
-    padding: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 8,
+    margin: spacing.lg,
+    padding: spacing.md,
+    backgroundColor: colors.danger,
+    borderRadius: radius.sm,
   },
   errorText: {
-    color: colors.background,
-    fontSize: fontSizes[14],
+    ...type.caption,
+    color: colors.onDark,
     textAlign: 'center',
   },
   avatarSection: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingVertical: spacing.xl,
   },
   avatarContainer: {
     position: 'relative',
@@ -386,32 +374,16 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   form: {
-    padding: 20,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.text,
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  bioContainer: {
-    alignItems: 'flex-start',
-    paddingVertical: 12,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    color: colors.background,
-    fontSize: fontSizes[16],
+  bioIcon: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.xs,
   },
   bioInput: {
     height: 120,
-    paddingTop: 4,
+    paddingTop: spacing.xs,
   },
   loadingContainer: {
     flex: 1,
@@ -420,8 +392,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: fontSizes[16],
+    marginTop: spacing.sm,
+    ...type.body,
     color: colors.text,
   },
 });
